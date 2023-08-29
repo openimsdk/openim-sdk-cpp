@@ -6,10 +6,10 @@ typedef void (*base_func)();
 typedef void (*err_func)(int,void *);
 
 base_func _onConnecting;
- base_func _onConnectSuccess;
+base_func _onConnectSuccess;
 base_func _onKickedOffline;
- base_func _onUserTokenExpired;
- err_func _onConnectFailed;
+base_func _onUserTokenExpired;
+err_func _onConnectFailed;
 
 void c_onConnecting()
 {

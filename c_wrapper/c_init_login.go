@@ -26,8 +26,8 @@ import (
 	"unsafe"
 )
 
-//export  InitSDK
-func InitSDK(onConnecting C.base_func,
+//export  init_sdk
+func init_sdk(onConnecting C.base_func,
 	onConnectSuccess C.base_func,
 	onKickedOffline C.base_func,
 	onUserTokenExpired C.base_func,

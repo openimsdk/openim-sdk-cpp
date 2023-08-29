@@ -96,7 +96,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern __declspec(dllexport) GoUint8 InitSDK(base_func onConnecting, base_func onConnectSuccess, base_func onKickedOffline, base_func onUserTokenExpired, err_func onConnectFailed, char* operationID, char* config);
+extern __declspec(dllexport) GoUint8 init_sdk(base_func onConnecting, base_func onConnectSuccess, base_func onKickedOffline, base_func onUserTokenExpired, err_func onConnectFailed, char* operationID, char* config);
 
 #ifdef __cplusplus
 }
