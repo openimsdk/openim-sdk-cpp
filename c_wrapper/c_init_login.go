@@ -5,18 +5,12 @@ package main
 
 typedef void (*base_func)();
 typedef void (*err_func)(int,void *);
+typedef void (*success_func)(char *);
 
-extern base_func _onConnecting;
-extern base_func _onConnectSuccess;
-extern base_func _onKickedOffline;
-extern base_func _onUserTokenExpired;
-extern err_func _onConnectFailed;
 
-extern void c_onConnecting();
-extern void c_onConnectSuccess();
-extern void c_onKickedOffline();
-extern void c_onUserTokenExpired();
-extern void c_onConnectFailed(int ,void*);
+extern void c_base_caller(base_func func);
+extern void c_err_caller(err_func func,int ,void*);
+extern void c_success_caller(success_func func,char* data);
 
 
 */
@@ -36,9 +30,16 @@ func init_sdk(onConnecting C.base_func,
 	callback := NewConnCallback(onConnecting, onConnectSuccess, onKickedOffline, onUserTokenExpired, onConnectFailed)
 	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
 }
-// func main() {
 
-// }
+//export  login
+func login(successFunc C.success_func, failedFunc C.err_func, operationID, uid, token *C.char) {
+	baseCallback := NewBaseCallback(successFunc, failedFunc)
+	open_im_sdk.Login(baseCallback, C.GoString(operationID), C.GoString(uid), C.GoString(token))
+}
+
+func main() {
+
+}
 
 type ConnCallback struct {
 	onConnecting       C.base_func
@@ -55,26 +56,39 @@ func NewConnCallback(onConnecting C.base_func, onConnectSuccess C.base_func,
 }
 
 func (c ConnCallback) OnConnecting() {
-	C._onConnecting = c.onConnecting
-	C.c_onConnecting()
+	C.c_base_caller(c.onConnecting)
 }
 
 func (c ConnCallback) OnConnectSuccess() {
-	C._onConnectSuccess = c.onConnectSuccess
-	C.c_onConnectSuccess()
+	C.c_base_caller(c.onConnectSuccess)
 }
 
 func (c ConnCallback) OnConnectFailed(errCode int32, errMsg string) {
-	C._onConnectFailed = c.onConnectFailed
-	C.c_onConnectFailed(C.int(errCode), unsafe.Pointer(C.CString(errMsg)))
+	C.c_err_caller(c.onConnectFailed, C.int(errCode), unsafe.Pointer(C.CString(errMsg)))
+
 }
 
 func (c ConnCallback) OnKickedOffline() {
-	C._onKickedOffline = c.onKickedOffline
-	C.c_onKickedOffline()
+	C.c_base_caller(c.onKickedOffline)
 }
 
 func (c ConnCallback) OnUserTokenExpired() {
-	C._onUserTokenExpired = c.onUserTokenExpired
-	C.c_onUserTokenExpired()
+	C.c_base_caller(c.onUserTokenExpired)
+}
+
+type BaseCallback struct {
+	successFunc C.success_func
+	failedFunc  C.err_func
+}
+
+func NewBaseCallback(successFunc C.success_func, failedFunc C.err_func) *BaseCallback {
+	return &BaseCallback{successFunc: successFunc, failedFunc: failedFunc}
+}
+
+func (b BaseCallback) OnError(errCode int32, errMsg string) {
+	C.c_err_caller(b.failedFunc, C.int(errCode), unsafe.Pointer(C.CString(errMsg)))
+}
+
+func (b BaseCallback) OnSuccess(data string) {
+	C.c_success_caller(b.successFunc, C.CString(data))
 }
