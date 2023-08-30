@@ -1,1 +1,1 @@
-go build -buildmode=c-shared -ldflags="-s -w"  -o c_wrapper.dll  export.go
+go build -buildmode=c-shared -ldflags="-s -w"  -o openim.dll  export.go
