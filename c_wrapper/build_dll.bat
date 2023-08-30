@@ -1,1 +1,1 @@
-go build -buildmode=c-shared -o c_wrapper.dll c_init_login.go export.go
+go build -buildmode=c-shared -ldflags="-s -w"  -o c_wrapper.dll  export.go
