@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "c_wrapper.h"
+#include "openIM.h"
 
 typedef struct
 {
@@ -33,7 +33,7 @@ void on_user_token_expired()
 {
     printf("on_user_token_expired\n");
 }
-void on_connect_failed(int err_code, void *err_msg)
+void on_connect_failed(int err_code, char *err_msg)
 {
     char *message = (char *)err_msg;
     printf("Error code: %d\n", err_code);
@@ -43,7 +43,7 @@ void success(char *data)
 {
     printf("login success : %s\n", data);
 }
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char operationID[] = "12345";
     char uid[] = "6959062403";
@@ -58,4 +58,5 @@ void main(int argc, char **argv)
     login(success, on_connect_failed, operationID, uid, token);
 
     sleep(1000000);
+    return 0;
 }

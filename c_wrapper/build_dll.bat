@@ -1,1 +1,2 @@
-go build -buildmode=c-shared -ldflags="-s -w"  -o openim.dll  export.go
+go build -buildmode=c-shared  -trimpath -ldflags="-s -w"  -o openIM.dll  export.go
+
