@@ -36,9 +36,9 @@ func init_sdk(onConnecting C.base_func,
 	callback := NewConnCallback(onConnecting, onConnectSuccess, onKickedOffline, onUserTokenExpired, onConnectFailed)
 	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
 }
-func main() {
+// func main() {
 
-}
+// }
 
 type ConnCallback struct {
 	onConnecting       C.base_func

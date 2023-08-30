@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "c_wrapper.h": "c"
+    }
+}

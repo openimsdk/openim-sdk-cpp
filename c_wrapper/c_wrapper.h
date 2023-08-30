@@ -19,28 +19,6 @@ typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 /* Start of preamble from import "C" comments.  */
 
 
-#line 3 "c_init_login.go"
-
-#include <stdio.h>
-
-typedef void (*base_func)();
-typedef void (*err_func)(int,void *);
-
-extern base_func _onConnecting;
-extern base_func _onConnectSuccess;
-extern base_func _onKickedOffline;
-extern base_func _onUserTokenExpired;
-extern err_func _onConnectFailed;
-
-extern void c_onConnecting();
-extern void c_onConnectSuccess();
-extern void c_onKickedOffline();
-extern void c_onUserTokenExpired();
-extern void c_onConnectFailed(int ,void*);
-
-
-
-#line 1 "cgo-generated-wrapper"
 
 
 /* End of preamble from import "C" comments.  */
@@ -96,7 +74,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern __declspec(dllexport) GoUint8 init_sdk(base_func onConnecting, base_func onConnectSuccess, base_func onKickedOffline, base_func onUserTokenExpired, err_func onConnectFailed, char* operationID, char* config);
+extern __declspec(dllexport) void Init_SDK();
 
 #ifdef __cplusplus
 }
