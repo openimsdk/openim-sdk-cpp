@@ -56,6 +56,9 @@ int main(int argc, char **argv)
     printf("init_result: %u\n", init_result);
 
     login(success, on_connect_failed, operationID, uid, token);
+//    char text[] = "哈哈";
+    GoString message = create_text_message(operationID,"哈哈");
+    printf("return :%s",message);
 
     sleep(1000000);
     return 0;
