@@ -1,1 +1,1 @@
-gcc -o test.exe -L. openIM.dll test.c
+gcc -o test.exe -L. openimsdk.dll test.c
