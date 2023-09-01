@@ -1,5 +1,5 @@
 set NDK_PATH=D:\android_sdk\ndk-bundle
-set SO_NAME=openIM
+set SO_NAME=libopenimsdk
 set OUT_PATH=android\
 
 set CGO_ENABLED=1
