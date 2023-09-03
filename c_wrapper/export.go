@@ -2,30 +2,12 @@ package main
 
 /*
 #include <stdio.h>
-typedef void (*CB)();
-typedef void (*CB_I_S)(int,char *);
-typedef void (*CB_S)(char *);
-typedef void (*CB_I)(int);
-__attribute__((weak))
-void Call_CB(CB func)
-{
-    func();
-}
-__attribute__((weak))
-void Call_CB_I_S(CB_I_S func,int errCode,char* errMsg)
-{
-    func(errCode,errMsg);
-}
-__attribute__((weak))
-void Call_CB_S(CB_S func,char* data)
-{
-    func(data);
-}
-__attribute__((weak))
-void Call_CB_I(CB_I func,int progress)
-{
-    func(progress);
-}
+typedef void (*CB_I_I_S)(int,int,char *);
+typedef void (*CB_I_S_S)(int,char *,char *);
+typedef void (*CB_I_S_S_I)(int,char *,char *,int);
+extern void Call_CB_I_I_S(CB_I_I_S func,int event,int errCode,char* errMsg);
+extern void Call_CB_I_S_S(CB_I_S_S func,int errCode,char* errMsg,char* data);
+extern void Call_CB_I_S_S_I(CB_I_S_S_I func,int errCode,char* errMsg,char* data,int progress);
 */
 import "C"
 
@@ -34,78 +16,75 @@ import (
 )
 
 type ConnCallback struct {
-	onConnecting       C.CB
-	onConnectSuccess   C.CB
-	onConnectFailed    C.CB_I_S
-	onKickedOffline    C.CB
-	onUserTokenExpired C.CB
+	cCallback C.CB_I_I_S
 }
 
-func NewConnCallback(onConnecting C.CB, onConnectSuccess C.CB,
-	onKickedOffline C.CB, onUserTokenExpired C.CB, onConnectFailed C.CB_I_S) *ConnCallback {
-	return &ConnCallback{onConnecting: onConnecting, onConnectSuccess: onConnectSuccess,
-		onKickedOffline: onKickedOffline, onUserTokenExpired: onUserTokenExpired, onConnectFailed: onConnectFailed}
+func NewConnCallback(cCallback C.CB_I_I_S) *ConnCallback {
+	return &ConnCallback{cCallback: cCallback}
 }
 
 func (c ConnCallback) OnConnecting() {
-	C.Call_CB(c.onConnecting)
+	C.Call_CB_I_I_S(c.cCallback, CONNECTING, NO_ERR, NO_ERR_MSG)
 }
 
 func (c ConnCallback) OnConnectSuccess() {
-	C.Call_CB(c.onConnectSuccess)
+	C.Call_CB_I_I_S(c.cCallback, CONNECT_SUCCESS, NO_ERR, NO_ERR_MSG)
 }
 
 func (c ConnCallback) OnConnectFailed(errCode int32, errMsg string) {
-	C.Call_CB_I_S(c.onConnectFailed, C.int(errCode), C.CString(errMsg))
+	C.Call_CB_I_I_S(c.cCallback, CONNECT_FAILED, C.int(errCode), C.CString(errMsg))
 
 }
 
 func (c ConnCallback) OnKickedOffline() {
-	C.Call_CB(c.onKickedOffline)
+	C.Call_CB_I_I_S(c.cCallback, KICKED_OFFLINE, NO_ERR, NO_ERR_MSG)
 }
 
 func (c ConnCallback) OnUserTokenExpired() {
-	C.Call_CB(c.onUserTokenExpired)
+	C.Call_CB_I_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_ERR, NO_ERR_MSG)
 }
 
 type SendMessageCallback struct {
-	*BaseCallback
-	progressFunc C.CB_I
+	cCallback C.CB_I_S_S_I
 }
 
-func NewSendMessageCallback(baseCallback *BaseCallback, progressFunc C.CB_I) *SendMessageCallback {
-	return &SendMessageCallback{BaseCallback: baseCallback, progressFunc: progressFunc}
+func NewSendMessageCallback(cCallback C.CB_I_S_S_I) *SendMessageCallback {
+	return &SendMessageCallback{cCallback: cCallback}
+}
+
+func (s SendMessageCallback) OnError(errCode int32, errMsg string) {
+	C.Call_CB_I_S_S_I(s.cCallback, C.int(errCode), C.CString(errMsg), NO_DATA, NO_PROGRESS)
+}
+
+func (s SendMessageCallback) OnSuccess(data string) {
+	C.Call_CB_I_S_S_I(s.cCallback, NO_ERR, NO_ERR_MSG, C.CString(data), NO_PROGRESS)
 }
 
 func (s SendMessageCallback) OnProgress(progress int) {
-	C.Call_CB_I(s.progressFunc, C.int(progress))
+	C.Call_CB_I_S_S_I(s.cCallback, NO_ERR, NO_ERR_MSG, NO_DATA, C.int(progress))
 }
 
 type BaseCallback struct {
-	successFunc C.CB_S
-	failedFunc  C.CB_I_S
+	cCallback C.CB_I_S_S
 }
 
-func NewBaseCallback(successFunc C.CB_S, failedFunc C.CB_I_S) *BaseCallback {
-	return &BaseCallback{successFunc: successFunc, failedFunc: failedFunc}
+func NewBaseCallback(cCallback C.CB_I_S_S) *BaseCallback {
+	return &BaseCallback{cCallback: cCallback}
 }
 
 func (b BaseCallback) OnError(errCode int32, errMsg string) {
-	C.Call_CB_I_S(b.failedFunc, C.int(errCode), C.CString(errMsg))
+	C.Call_CB_I_S_S(b.cCallback, C.int(errCode), C.CString(errMsg), NO_DATA)
 }
 
 func (b BaseCallback) OnSuccess(data string) {
-	C.Call_CB_S(b.successFunc, C.CString(data))
+	C.Call_CB_I_S_S(b.cCallback, NO_ERR, NO_ERR_MSG, C.CString(data))
 }
 
 //export  init_sdk
-func init_sdk(onConnecting C.CB,
-	onConnectSuccess C.CB,
-	onKickedOffline C.CB,
-	onUserTokenExpired C.CB,
-	onConnectFailed C.CB_I_S,
+func init_sdk(
+	cCallback C.CB_I_I_S,
 	operationID *C.char, config *C.char) bool {
-	callback := NewConnCallback(onConnecting, onConnectSuccess, onKickedOffline, onUserTokenExpired, onConnectFailed)
+	callback := NewConnCallback(cCallback)
 	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
 }
 
@@ -115,20 +94,20 @@ func un_init_sdk(operationID *C.char) {
 }
 
 //export  login
-func login(successFunc C.CB_S, failedFunc C.CB_I_S, operationID, uid, token *C.char) {
-	baseCallback := NewBaseCallback(successFunc, failedFunc)
+func login(cCallback C.CB_I_S_S, operationID, uid, token *C.char) {
+	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.Login(baseCallback, C.GoString(operationID), C.GoString(uid), C.GoString(token))
 }
 
 //export  logout
-func logout(successFunc C.CB_S, failedFunc C.CB_I_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(successFunc, failedFunc)
+func logout(cCallback C.CB_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
 }
 
 //export  network_status_changed
-func network_status_changed(successFunc C.CB_S, failedFunc C.CB_I_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(successFunc, failedFunc)
+func network_status_changed(cCallback C.CB_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.NetworkStatusChanged(baseCallback, C.GoString(operationID))
 }
 
@@ -258,9 +237,8 @@ func create_forward_message(operationID, m *C.char) string {
 }
 
 //export send_message
-func send_message(successFunc C.CB_S, failedFunc C.CB_I_S, progressFunc C.CB_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
-	baseCallback := NewBaseCallback(successFunc, failedFunc)
-	sendMsgCallback := NewSendMessageCallback(baseCallback, progressFunc)
+func send_message(cCallback C.CB_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+	sendMsgCallback := NewSendMessageCallback(cCallback)
 	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID), C.GoString(groupID), C.GoString(offlinePushInfo))
 }
 
