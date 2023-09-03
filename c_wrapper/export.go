@@ -2,10 +2,10 @@ package main
 
 /*
 #include <stdio.h>
-typedef void (*CB_I_I_S)(int,int,char *);
+typedef void (*CB_I_S)(int,char *);
 typedef void (*CB_I_S_S)(int,char *,char *);
 typedef void (*CB_I_S_S_I)(int,char *,char *,int);
-extern void Call_CB_I_I_S(CB_I_I_S func,int event,int errCode,char* errMsg);
+extern void Call_CB_I_S(CB_I_S func,int event,char* data);
 extern void Call_CB_I_S_S(CB_I_S_S func,int errCode,char* errMsg,char* data);
 extern void Call_CB_I_S_S_I(CB_I_S_S_I func,int errCode,char* errMsg,char* data,int progress);
 */
@@ -15,33 +15,38 @@ import (
 	"open_im_sdk/open_im_sdk"
 )
 
+type Base struct {
+	ErrCode int32  `json:"errCode"`
+	ErrMsg  string `json:"errMsg"`
+}
 type ConnCallback struct {
-	cCallback C.CB_I_I_S
+	cCallback C.CB_I_S
 }
 
-func NewConnCallback(cCallback C.CB_I_I_S) *ConnCallback {
+func NewConnCallback(cCallback C.CB_I_S) *ConnCallback {
 	return &ConnCallback{cCallback: cCallback}
 }
 
 func (c ConnCallback) OnConnecting() {
-	C.Call_CB_I_I_S(c.cCallback, CONNECTING, NO_ERR, NO_ERR_MSG)
+	C.Call_CB_I_S(c.cCallback, CONNECTING, NO_DATA)
 }
 
 func (c ConnCallback) OnConnectSuccess() {
-	C.Call_CB_I_I_S(c.cCallback, CONNECT_SUCCESS, NO_ERR, NO_ERR_MSG)
+	C.Call_CB_I_S(c.cCallback, CONNECT_SUCCESS, NO_DATA)
 }
 
 func (c ConnCallback) OnConnectFailed(errCode int32, errMsg string) {
-	C.Call_CB_I_I_S(c.cCallback, CONNECT_FAILED, C.int(errCode), C.CString(errMsg))
+
+	C.Call_CB_I_S(c.cCallback, CONNECT_FAILED, C.CString(StructToJsonString(Base{ErrCode: errCode, ErrMsg: errMsg})))
 
 }
 
 func (c ConnCallback) OnKickedOffline() {
-	C.Call_CB_I_I_S(c.cCallback, KICKED_OFFLINE, NO_ERR, NO_ERR_MSG)
+	C.Call_CB_I_S(c.cCallback, KICKED_OFFLINE, NO_DATA)
 }
 
 func (c ConnCallback) OnUserTokenExpired() {
-	C.Call_CB_I_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_ERR, NO_ERR_MSG)
+	C.Call_CB_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_DATA)
 }
 
 type SendMessageCallback struct {
@@ -82,7 +87,7 @@ func (b BaseCallback) OnSuccess(data string) {
 
 //export  init_sdk
 func init_sdk(
-	cCallback C.CB_I_I_S,
+	cCallback C.CB_I_S,
 	operationID *C.char, config *C.char) bool {
 	callback := NewConnCallback(cCallback)
 	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
