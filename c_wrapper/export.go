@@ -122,123 +122,123 @@ func get_login_status(operationID *C.char) int {
 }
 
 //export  get_login_user
-func get_login_user() string {
-	return open_im_sdk.GetLoginUserID()
+func get_login_user() *C.char {
+	return C.CString(open_im_sdk.GetLoginUserID())
 }
 
 //export  create_text_message
-func create_text_message(operationID, text *C.char) string {
-	return open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text))
+func create_text_message(operationID, text *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text)))
 }
 
 //export create_advanced_text_message
-func create_advanced_text_message(operationID, text, messageEntityList *C.char) string {
-	return open_im_sdk.CreateAdvancedTextMessage(C.GoString(operationID), C.GoString(text), C.GoString(messageEntityList))
+func create_advanced_text_message(operationID, text, messageEntityList *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateAdvancedTextMessage(C.GoString(operationID), C.GoString(text), C.GoString(messageEntityList)))
 }
 
 //export create_text_at_message
-func create_text_at_message(operationID, text, atUserList, atUsersInfo, message *C.char) string {
-	return open_im_sdk.CreateTextAtMessage(C.GoString(operationID), C.GoString(text), C.GoString(atUserList), C.GoString(atUsersInfo), C.GoString(message))
+func create_text_at_message(operationID, text, atUserList, atUsersInfo, message *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateTextAtMessage(C.GoString(operationID), C.GoString(text), C.GoString(atUserList), C.GoString(atUsersInfo), C.GoString(message)))
 }
 
 //export create_location_message
-func create_location_message(operationID, description *C.char, longitude, latitude C.double) string {
-	return open_im_sdk.CreateLocationMessage(C.GoString(operationID), C.GoString(description), float64(longitude), float64(latitude))
+func create_location_message(operationID, description *C.char, longitude, latitude C.double) *C.char {
+	return C.CString(open_im_sdk.CreateLocationMessage(C.GoString(operationID), C.GoString(description), float64(longitude), float64(latitude)))
 }
 
 //export create_custom_message
-func create_custom_message(operationID, data, extension, description *C.char) string {
-	return open_im_sdk.CreateCustomMessage(C.GoString(operationID), C.GoString(data), C.GoString(extension), C.GoString(description))
+func create_custom_message(operationID, data, extension, description *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateCustomMessage(C.GoString(operationID), C.GoString(data), C.GoString(extension), C.GoString(description)))
 }
 
 //export create_quote_message
-func create_quote_message(operationID, text, message *C.char) string {
-	return open_im_sdk.CreateQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message))
+func create_quote_message(operationID, text, message *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message)))
 }
 
 //export create_advanced_quote_message
-func create_advanced_quote_message(operationID, text, message, messageEntityList *C.char) string {
-	return open_im_sdk.CreateAdvancedQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message), C.GoString(messageEntityList))
+func create_advanced_quote_message(operationID, text, message, messageEntityList *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateAdvancedQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message), C.GoString(messageEntityList)))
 }
 
 //export create_card_message
-func create_card_message(operationID, cardInfo *C.char) string {
-	return open_im_sdk.CreateCardMessage(C.GoString(operationID), C.GoString(cardInfo))
+func create_card_message(operationID, cardInfo *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateCardMessage(C.GoString(operationID), C.GoString(cardInfo)))
 }
 
 //export create_video_message_from_full_path
-func create_video_message_from_full_path(operationID, videoFullPath, videoType *C.char, duration C.longlong, snapshotFullPath *C.char) string {
-	return open_im_sdk.CreateVideoMessageFromFullPath(C.GoString(operationID), C.GoString(videoFullPath), C.GoString(videoType), int64(duration), C.GoString(snapshotFullPath))
+func create_video_message_from_full_path(operationID, videoFullPath, videoType *C.char, duration C.longlong, snapshotFullPath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateVideoMessageFromFullPath(C.GoString(operationID), C.GoString(videoFullPath), C.GoString(videoType), int64(duration), C.GoString(snapshotFullPath)))
 }
 
 //export create_image_message_from_full_path
-func create_image_message_from_full_path(operationID, imageFullPath *C.char) string {
-	return open_im_sdk.CreateImageMessageFromFullPath(C.GoString(operationID), C.GoString(imageFullPath))
+func create_image_message_from_full_path(operationID, imageFullPath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateImageMessageFromFullPath(C.GoString(operationID), C.GoString(imageFullPath)))
 }
 
 //export create_sound_message_from_full_path
-func create_sound_message_from_full_path(operationID, soundPath *C.char, duration C.longlong) string {
-	return open_im_sdk.CreateSoundMessageFromFullPath(C.GoString(operationID), C.GoString(soundPath), int64(duration))
+func create_sound_message_from_full_path(operationID, soundPath *C.char, duration C.longlong) *C.char {
+	return C.CString(open_im_sdk.CreateSoundMessageFromFullPath(C.GoString(operationID), C.GoString(soundPath), int64(duration)))
 }
 
 //export create_file_message_from_full_path
-func create_file_message_from_full_path(operationID, fileFullPath, fileName *C.char) string {
-	return open_im_sdk.CreateFileMessageFromFullPath(C.GoString(operationID), C.GoString(fileFullPath), C.GoString(fileName))
+func create_file_message_from_full_path(operationID, fileFullPath, fileName *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateFileMessageFromFullPath(C.GoString(operationID), C.GoString(fileFullPath), C.GoString(fileName)))
 }
 
 //export create_image_message
-func create_image_message(operationID, imagePath *C.char) string {
-	return open_im_sdk.CreateImageMessage(C.GoString(operationID), C.GoString(imagePath))
+func create_image_message(operationID, imagePath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateImageMessage(C.GoString(operationID), C.GoString(imagePath)))
 }
 
 //export create_image_message_by_url
-func create_image_message_by_url(operationID, sourcePicture, bigPicture, snapshotPicture *C.char) string {
-	return open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture), C.GoString(bigPicture), C.GoString(snapshotPicture))
+func create_image_message_by_url(operationID, sourcePicture, bigPicture, snapshotPicture *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture), C.GoString(bigPicture), C.GoString(snapshotPicture)))
 }
 
 //export create_sound_message_by_url
-func create_sound_message_by_url(operationID, soundBaseInfo *C.char) string {
-	return open_im_sdk.CreateSoundMessageByURL(C.GoString(operationID), C.GoString(soundBaseInfo))
+func create_sound_message_by_url(operationID, soundBaseInfo *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateSoundMessageByURL(C.GoString(operationID), C.GoString(soundBaseInfo)))
 }
 
 //export create_sound_message
-func create_sound_message(operationID, soundPath *C.char, duration C.longlong) string {
-	return open_im_sdk.CreateSoundMessage(C.GoString(operationID), C.GoString(soundPath), int64(duration))
+func create_sound_message(operationID, soundPath *C.char, duration C.longlong) *C.char {
+	return C.CString(open_im_sdk.CreateSoundMessage(C.GoString(operationID), C.GoString(soundPath), int64(duration)))
 }
 
 //export create_video_message_by_url
-func create_video_message_by_url(operationID, videoBaseInfo *C.char) string {
-	return open_im_sdk.CreateVideoMessageByURL(C.GoString(operationID), C.GoString(videoBaseInfo))
+func create_video_message_by_url(operationID, videoBaseInfo *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateVideoMessageByURL(C.GoString(operationID), C.GoString(videoBaseInfo)))
 }
 
 //export create_video_message
-func create_video_message(operationID, videoPath *C.char, videoType *C.char, duration C.longlong, snapshotPath *C.char) string {
-	return open_im_sdk.CreateVideoMessage(C.GoString(operationID), C.GoString(videoPath), C.GoString(videoType), int64(duration), C.GoString(snapshotPath))
+func create_video_message(operationID, videoPath *C.char, videoType *C.char, duration C.longlong, snapshotPath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateVideoMessage(C.GoString(operationID), C.GoString(videoPath), C.GoString(videoType), int64(duration), C.GoString(snapshotPath)))
 }
 
 //export create_file_message_by_url
-func create_file_message_by_url(operationID, fileBaseInfo *C.char) string {
-	return open_im_sdk.CreateFileMessageByURL(C.GoString(operationID), C.GoString(fileBaseInfo))
+func create_file_message_by_url(operationID, fileBaseInfo *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateFileMessageByURL(C.GoString(operationID), C.GoString(fileBaseInfo)))
 }
 
 //export create_file_message
-func create_file_message(operationID, filePath, fileName *C.char) string {
-	return open_im_sdk.CreateFileMessage(C.GoString(operationID), C.GoString(filePath), C.GoString(fileName))
+func create_file_message(operationID, filePath, fileName *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateFileMessage(C.GoString(operationID), C.GoString(filePath), C.GoString(fileName)))
 }
 
 //export create_merger_message
-func create_merger_message(operationID, messageList, title, summaryList *C.char) string {
-	return open_im_sdk.CreateMergerMessage(C.GoString(operationID), C.GoString(messageList), C.GoString(title), C.GoString(summaryList))
+func create_merger_message(operationID, messageList, title, summaryList *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateMergerMessage(C.GoString(operationID), C.GoString(messageList), C.GoString(title), C.GoString(summaryList)))
 }
 
 //export create_face_message
-func create_face_message(operationID *C.char, index C.int, data *C.char) string {
-	return open_im_sdk.CreateFaceMessage(C.GoString(operationID), int(index), C.GoString(data))
+func create_face_message(operationID *C.char, index C.int, data *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateFaceMessage(C.GoString(operationID), int(index), C.GoString(data)))
 }
 
 //export create_forward_message
-func create_forward_message(operationID, m *C.char) string {
-	return open_im_sdk.CreateForwardMessage(C.GoString(operationID), C.GoString(m))
+func create_forward_message(operationID, m *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateForwardMessage(C.GoString(operationID), C.GoString(m)))
 }
 
 //export send_message
