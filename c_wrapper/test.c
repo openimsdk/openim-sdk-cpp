@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "openIM.h"
+#include "openimsdk.h"
 
 typedef struct
 {
@@ -17,31 +17,15 @@ typedef struct
     GoUint8 isExternalExtensions;
 } IMConfigC;
 
-void on_connecting()
+void c_conn_callback(int event, char *data)
 {
-    printf("on_connecting\n");
+  printf("C c_conn_callback receive from Go callbck code: %d,data: %s\n", event,data);
+
 }
-void on_connect_success()
+void c_base_callback(int errCode,char * errMsg,char *data)
 {
-    printf("on_connect_success\n");
-}
-void on_kick_offline()
-{
-    printf("on_kick_offline\n");
-}
-void on_user_token_expired()
-{
-    printf("on_user_token_expired\n");
-}
-void on_connect_failed(int err_code, char *err_msg)
-{
-    char *message = (char *)err_msg;
-    printf("Error code: %d\n", err_code);
-    printf("Error message: %s\n", message);
-}
-void success(char *data)
-{
-    printf("login success : %s\n", data);
+  printf("C c_base_callback  receive from Go callbck code: %d, errMsg: %s, data: %s\n", errCode,errMsg,data);
+
 }
 int main(int argc, char **argv)
 {
@@ -52,13 +36,18 @@ int main(int argc, char **argv)
     char *jsonString = "{\"platformID\": 3, \"apiAddr\": \"http://125.124.195.201:10002\", \"wsAddr\":\"ws://125.124.195.201:10001\",\"dataDir\": \"./\", \"logLevel\": 1, \"isLogStandardOutput\": true, \"logFilePath\": \"./\", \"isExternalExtensions\": true}";
 
     GoUint8 init_result;
-    init_result = init_sdk(on_connecting, on_connect_success, on_kick_offline, on_user_token_expired, on_connect_failed, operationID, jsonString);
+    init_result = init_sdk(c_conn_callback,operationID, jsonString);
     printf("init_result: %u\n", init_result);
 
-    login(success, on_connect_failed, operationID, uid, token);
+    login(c_base_callback, operationID, uid, token);
+    sleep(10);
 //    char text[] = "哈哈";
-    GoString message = create_text_message(operationID,"哈哈");
-    printf("return :%s",message);
+    char* loginUserID=get_login_user();
+
+        printf("return :%s\n",loginUserID);
+
+    char* message = create_text_message(operationID,"哈哈");
+    printf("return :%s\n",message);
 
     sleep(1000000);
     return 0;
