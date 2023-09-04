@@ -89,41 +89,35 @@ func (b BaseCallback) OnSuccess(data string) {
 func init_sdk(
 	cCallback C.CB_I_S,
 	operationID *C.char, config *C.char) bool {
-	defer FreeCString(operationID, config)
 	callback := NewConnCallback(cCallback)
 	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
 }
 
 //export un_init_sdk
 func un_init_sdk(operationID *C.char) {
-	defer FreeCString(operationID)
 	open_im_sdk.UnInitSDK(C.GoString(operationID))
 }
 
 //export  login
 func login(cCallback C.CB_I_S_S, operationID, uid, token *C.char) {
-	defer FreeCString(operationID, uid, token)
 	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.Login(baseCallback, C.GoString(operationID), C.GoString(uid), C.GoString(token))
 }
 
 //export  logout
 func logout(cCallback C.CB_I_S_S, operationID *C.char) {
-	defer FreeCString(operationID)
 	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
 }
 
 //export  network_status_changed
 func network_status_changed(cCallback C.CB_I_S_S, operationID *C.char) {
-	defer FreeCString(operationID)
 	baseCallback := NewBaseCallback(cCallback)
 	open_im_sdk.NetworkStatusChanged(baseCallback, C.GoString(operationID))
 }
 
 //export  get_login_status
 func get_login_status(operationID *C.char) int {
-	defer FreeCString(operationID)
 	return open_im_sdk.GetLoginStatus(C.GoString(operationID))
 }
 
@@ -134,145 +128,121 @@ func get_login_user() *C.char {
 
 //export  create_text_message
 func create_text_message(operationID, text *C.char) *C.char {
-	defer FreeCString(operationID, text)
 	return C.CString(open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text)))
 }
 
 //export create_advanced_text_message
 func create_advanced_text_message(operationID, text, messageEntityList *C.char) *C.char {
-	defer FreeCString(operationID, text, messageEntityList)
 	return C.CString(open_im_sdk.CreateAdvancedTextMessage(C.GoString(operationID), C.GoString(text), C.GoString(messageEntityList)))
 }
 
 //export create_text_at_message
 func create_text_at_message(operationID, text, atUserList, atUsersInfo, message *C.char) *C.char {
-	defer FreeCString(operationID, text, atUserList, atUsersInfo, message)
 	return C.CString(open_im_sdk.CreateTextAtMessage(C.GoString(operationID), C.GoString(text), C.GoString(atUserList), C.GoString(atUsersInfo), C.GoString(message)))
 }
 
 //export create_location_message
 func create_location_message(operationID, description *C.char, longitude, latitude C.double) *C.char {
-	defer FreeCString(operationID, description)
 	return C.CString(open_im_sdk.CreateLocationMessage(C.GoString(operationID), C.GoString(description), float64(longitude), float64(latitude)))
 }
 
 //export create_custom_message
 func create_custom_message(operationID, data, extension, description *C.char) *C.char {
-	defer FreeCString(operationID, data, extension, description)
 	return C.CString(open_im_sdk.CreateCustomMessage(C.GoString(operationID), C.GoString(data), C.GoString(extension), C.GoString(description)))
 }
 
 //export create_quote_message
 func create_quote_message(operationID, text, message *C.char) *C.char {
-	defer FreeCString(operationID, text, message)
 	return C.CString(open_im_sdk.CreateQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message)))
 }
 
 //export create_advanced_quote_message
 func create_advanced_quote_message(operationID, text, message, messageEntityList *C.char) *C.char {
-	defer FreeCString(operationID, text, message, messageEntityList)
 	return C.CString(open_im_sdk.CreateAdvancedQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message), C.GoString(messageEntityList)))
 }
 
 //export create_card_message
 func create_card_message(operationID, cardInfo *C.char) *C.char {
-	defer FreeCString(operationID, cardInfo)
 	return C.CString(open_im_sdk.CreateCardMessage(C.GoString(operationID), C.GoString(cardInfo)))
 }
 
 //export create_video_message_from_full_path
 func create_video_message_from_full_path(operationID, videoFullPath, videoType *C.char, duration C.longlong, snapshotFullPath *C.char) *C.char {
-	defer FreeCString(operationID, videoFullPath, videoType, snapshotFullPath)
 	return C.CString(open_im_sdk.CreateVideoMessageFromFullPath(C.GoString(operationID), C.GoString(videoFullPath), C.GoString(videoType), int64(duration), C.GoString(snapshotFullPath)))
 }
 
 //export create_image_message_from_full_path
 func create_image_message_from_full_path(operationID, imageFullPath *C.char) *C.char {
-	defer FreeCString(operationID, imageFullPath)
 	return C.CString(open_im_sdk.CreateImageMessageFromFullPath(C.GoString(operationID), C.GoString(imageFullPath)))
 }
 
 //export create_sound_message_from_full_path
 func create_sound_message_from_full_path(operationID, soundPath *C.char, duration C.longlong) *C.char {
-	defer FreeCString(operationID, soundPath)
 	return C.CString(open_im_sdk.CreateSoundMessageFromFullPath(C.GoString(operationID), C.GoString(soundPath), int64(duration)))
 }
 
 //export create_file_message_from_full_path
 func create_file_message_from_full_path(operationID, fileFullPath, fileName *C.char) *C.char {
-	defer FreeCString(operationID, fileFullPath, fileName)
 	return C.CString(open_im_sdk.CreateFileMessageFromFullPath(C.GoString(operationID), C.GoString(fileFullPath), C.GoString(fileName)))
 }
 
 //export create_image_message
 func create_image_message(operationID, imagePath *C.char) *C.char {
-	defer FreeCString(operationID, imagePath)
 	return C.CString(open_im_sdk.CreateImageMessage(C.GoString(operationID), C.GoString(imagePath)))
 }
 
 //export create_image_message_by_url
 func create_image_message_by_url(operationID, sourcePicture, bigPicture, snapshotPicture *C.char) *C.char {
-	defer FreeCString(operationID, sourcePicture, bigPicture, snapshotPicture)
 	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture), C.GoString(bigPicture), C.GoString(snapshotPicture)))
 }
 
 //export create_sound_message_by_url
 func create_sound_message_by_url(operationID, soundBaseInfo *C.char) *C.char {
-	defer FreeCString(operationID, soundBaseInfo)
 	return C.CString(open_im_sdk.CreateSoundMessageByURL(C.GoString(operationID), C.GoString(soundBaseInfo)))
 }
 
 //export create_sound_message
 func create_sound_message(operationID, soundPath *C.char, duration C.longlong) *C.char {
-	defer FreeCString(operationID, soundPath)
 	return C.CString(open_im_sdk.CreateSoundMessage(C.GoString(operationID), C.GoString(soundPath), int64(duration)))
 }
 
 //export create_video_message_by_url
 func create_video_message_by_url(operationID, videoBaseInfo *C.char) *C.char {
-	defer FreeCString(operationID, videoBaseInfo)
 	return C.CString(open_im_sdk.CreateVideoMessageByURL(C.GoString(operationID), C.GoString(videoBaseInfo)))
 }
 
 //export create_video_message
 func create_video_message(operationID, videoPath *C.char, videoType *C.char, duration C.longlong, snapshotPath *C.char) *C.char {
-	defer FreeCString(operationID, videoPath, videoType, snapshotPath)
 	return C.CString(open_im_sdk.CreateVideoMessage(C.GoString(operationID), C.GoString(videoPath), C.GoString(videoType), int64(duration), C.GoString(snapshotPath)))
 }
 
 //export create_file_message_by_url
 func create_file_message_by_url(operationID, fileBaseInfo *C.char) *C.char {
-	defer FreeCString(operationID, fileBaseInfo)
 	return C.CString(open_im_sdk.CreateFileMessageByURL(C.GoString(operationID), C.GoString(fileBaseInfo)))
 }
 
 //export create_file_message
 func create_file_message(operationID, filePath, fileName *C.char) *C.char {
-	defer FreeCString(operationID, filePath, fileName)
 	return C.CString(open_im_sdk.CreateFileMessage(C.GoString(operationID), C.GoString(filePath), C.GoString(fileName)))
 }
 
 //export create_merger_message
 func create_merger_message(operationID, messageList, title, summaryList *C.char) *C.char {
-	defer FreeCString(operationID, messageList, title, summaryList)
 	return C.CString(open_im_sdk.CreateMergerMessage(C.GoString(operationID), C.GoString(messageList), C.GoString(title), C.GoString(summaryList)))
 }
 
 //export create_face_message
 func create_face_message(operationID *C.char, index C.int, data *C.char) *C.char {
-	defer FreeCString(operationID, data)
 	return C.CString(open_im_sdk.CreateFaceMessage(C.GoString(operationID), int(index), C.GoString(data)))
 }
 
 //export create_forward_message
 func create_forward_message(operationID, m *C.char) *C.char {
-	defer FreeCString(operationID, m)
 	return C.CString(open_im_sdk.CreateForwardMessage(C.GoString(operationID), C.GoString(m)))
 }
 
 //export send_message
 func send_message(cCallback C.CB_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
-	defer FreeCString(operationID, message, recvID, groupID, offlinePushInfo)
 	sendMsgCallback := NewSendMessageCallback(cCallback)
 	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID), C.GoString(groupID), C.GoString(offlinePushInfo))
 }
