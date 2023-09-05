@@ -241,6 +241,18 @@ func create_forward_message(operationID, m *C.char) *C.char {
 	return C.CString(open_im_sdk.CreateForwardMessage(C.GoString(operationID), C.GoString(m)))
 }
 
+//export get_all_conversation_list
+func get_all_conversation_list(cCallback C.CB_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback)
+	open_im_sdk.GetAllConversationList(baseCallback, C.GoString(operationID))
+}
+
+//export get_advanced_history_message_list
+func get_advanced_history_message_list(cCallback C.CB_I_S_S, operationID, getMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(cCallback)
+	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
+}
+
 //export send_message
 func send_message(cCallback C.CB_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
 	sendMsgCallback := NewSendMessageCallback(cCallback)
