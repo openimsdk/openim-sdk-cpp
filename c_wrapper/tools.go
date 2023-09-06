@@ -11,7 +11,10 @@ import (
 	"unsafe"
 )
 
-func parseBool() bool {
+func parseBool(b int) bool {
+	if b == 1 {
+		return true
+	}
 	return false
 }
 
