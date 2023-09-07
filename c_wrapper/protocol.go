@@ -9,14 +9,17 @@ typedef void (*CB_I_S_S_I)(int,char *,char *,int);
 void Call_CB_I_S(CB_I_S func,int event,char* data)
 {
     func(event,data);
+    free(data);
 }
 void Call_CB_I_S_S(CB_I_S_S func,int errCode,char* errMsg,char* data)
 {
     func(errCode,errMsg,data);
+    free(errMsg,data);
 }
 void Call_CB_I_S_S_I(CB_I_S_S_I func,int errCode,char* errMsg,char* data,int progress)
 {
     func(errCode,errMsg,data,progress);
+    free(errMsg,data);
 }
 enum CONN_EVENT{
    CONNECTING,
