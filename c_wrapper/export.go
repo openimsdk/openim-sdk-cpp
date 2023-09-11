@@ -422,22 +422,26 @@ func create_text_message(operationID, text *C.char) *C.char {
 
 //export create_advanced_text_message
 func create_advanced_text_message(operationID, text, messageEntityList *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateAdvancedTextMessage(C.GoString(operationID), C.GoString(text), C.GoString(messageEntityList)))
+	return C.CString(open_im_sdk.CreateAdvancedTextMessage(C.GoString(operationID), C.GoString(text),
+		C.GoString(messageEntityList)))
 }
 
 //export create_text_at_message
 func create_text_at_message(operationID, text, atUserList, atUsersInfo, message *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateTextAtMessage(C.GoString(operationID), C.GoString(text), C.GoString(atUserList), C.GoString(atUsersInfo), C.GoString(message)))
+	return C.CString(open_im_sdk.CreateTextAtMessage(C.GoString(operationID), C.GoString(text), C.GoString(atUserList),
+		C.GoString(atUsersInfo), C.GoString(message)))
 }
 
 //export create_location_message
 func create_location_message(operationID, description *C.char, longitude, latitude C.double) *C.char {
-	return C.CString(open_im_sdk.CreateLocationMessage(C.GoString(operationID), C.GoString(description), float64(longitude), float64(latitude)))
+	return C.CString(open_im_sdk.CreateLocationMessage(C.GoString(operationID), C.GoString(description),
+		float64(longitude), float64(latitude)))
 }
 
 //export create_custom_message
 func create_custom_message(operationID, data, extension, description *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateCustomMessage(C.GoString(operationID), C.GoString(data), C.GoString(extension), C.GoString(description)))
+	return C.CString(open_im_sdk.CreateCustomMessage(C.GoString(operationID), C.GoString(data), C.GoString(extension),
+		C.GoString(description)))
 }
 
 //export create_quote_message
@@ -447,7 +451,8 @@ func create_quote_message(operationID, text, message *C.char) *C.char {
 
 //export create_advanced_quote_message
 func create_advanced_quote_message(operationID, text, message, messageEntityList *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateAdvancedQuoteMessage(C.GoString(operationID), C.GoString(text), C.GoString(message), C.GoString(messageEntityList)))
+	return C.CString(open_im_sdk.CreateAdvancedQuoteMessage(C.GoString(operationID), C.GoString(text),
+		C.GoString(message), C.GoString(messageEntityList)))
 }
 
 //export create_card_message
@@ -456,8 +461,10 @@ func create_card_message(operationID, cardInfo *C.char) *C.char {
 }
 
 //export create_video_message_from_full_path
-func create_video_message_from_full_path(operationID, videoFullPath, videoType *C.char, duration C.longlong, snapshotFullPath *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateVideoMessageFromFullPath(C.GoString(operationID), C.GoString(videoFullPath), C.GoString(videoType), int64(duration), C.GoString(snapshotFullPath)))
+func create_video_message_from_full_path(operationID, videoFullPath, videoType *C.char, duration C.longlong,
+	snapshotFullPath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateVideoMessageFromFullPath(C.GoString(operationID), C.GoString(videoFullPath),
+		C.GoString(videoType), int64(duration), C.GoString(snapshotFullPath)))
 }
 
 //export create_image_message_from_full_path
@@ -467,12 +474,14 @@ func create_image_message_from_full_path(operationID, imageFullPath *C.char) *C.
 
 //export create_sound_message_from_full_path
 func create_sound_message_from_full_path(operationID, soundPath *C.char, duration C.longlong) *C.char {
-	return C.CString(open_im_sdk.CreateSoundMessageFromFullPath(C.GoString(operationID), C.GoString(soundPath), int64(duration)))
+	return C.CString(open_im_sdk.CreateSoundMessageFromFullPath(C.GoString(operationID), C.GoString(soundPath),
+		int64(duration)))
 }
 
 //export create_file_message_from_full_path
 func create_file_message_from_full_path(operationID, fileFullPath, fileName *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateFileMessageFromFullPath(C.GoString(operationID), C.GoString(fileFullPath), C.GoString(fileName)))
+	return C.CString(open_im_sdk.CreateFileMessageFromFullPath(C.GoString(operationID), C.GoString(fileFullPath),
+		C.GoString(fileName)))
 }
 
 //export create_image_message
@@ -482,7 +491,8 @@ func create_image_message(operationID, imagePath *C.char) *C.char {
 
 //export create_image_message_by_url
 func create_image_message_by_url(operationID, sourcePicture, bigPicture, snapshotPicture *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture), C.GoString(bigPicture), C.GoString(snapshotPicture)))
+	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture),
+		C.GoString(bigPicture), C.GoString(snapshotPicture)))
 }
 
 //export create_sound_message_by_url
@@ -501,8 +511,10 @@ func create_video_message_by_url(operationID, videoBaseInfo *C.char) *C.char {
 }
 
 //export create_video_message
-func create_video_message(operationID, videoPath *C.char, videoType *C.char, duration C.longlong, snapshotPath *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateVideoMessage(C.GoString(operationID), C.GoString(videoPath), C.GoString(videoType), int64(duration), C.GoString(snapshotPath)))
+func create_video_message(operationID, videoPath *C.char, videoType *C.char, duration C.longlong,
+	snapshotPath *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateVideoMessage(C.GoString(operationID), C.GoString(videoPath),
+		C.GoString(videoType), int64(duration), C.GoString(snapshotPath)))
 }
 
 //export create_file_message_by_url
@@ -517,7 +529,8 @@ func create_file_message(operationID, filePath, fileName *C.char) *C.char {
 
 //export create_merger_message
 func create_merger_message(operationID, messageList, title, summaryList *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateMergerMessage(C.GoString(operationID), C.GoString(messageList), C.GoString(title), C.GoString(summaryList)))
+	return C.CString(open_im_sdk.CreateMergerMessage(C.GoString(operationID), C.GoString(messageList),
+		C.GoString(title), C.GoString(summaryList)))
 }
 
 //export create_face_message
@@ -545,7 +558,8 @@ func get_advanced_history_message_list(cCallback C.CB_S_I_S_S, operationID, getM
 //export send_message
 func send_message(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
 	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
-	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID), C.GoString(groupID), C.GoString(offlinePushInfo))
+	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
+		C.GoString(groupID), C.GoString(offlinePushInfo))
 }
 
 // =====================================================user===============================================
@@ -710,7 +724,8 @@ func create_group(cCallback C.CB_S_I_S_S, operationID, cGroupReqInfo *C.char) {
 //export join_group
 func join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReqMsg), int32(cJoinSource))
+	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReqMsg),
+		int32(cJoinSource))
 }
 
 // QuitGroup quits a group
@@ -742,7 +757,8 @@ func change_group_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cI
 //export change_group_member_mute
 func change_group_member_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID *C.char, cMutedSeconds C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.ChangeGroupMemberMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID), int(cMutedSeconds))
+	open_im_sdk.ChangeGroupMemberMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID),
+		int(cMutedSeconds))
 }
 
 // SetGroupMemberRoleLevel sets the role level of a group member
@@ -750,7 +766,8 @@ func change_group_member_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUs
 //export set_group_member_role_level
 func set_group_member_role_level(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID *C.char, cRoleLevel C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID), int(cRoleLevel))
+	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cUserID), int(cRoleLevel))
 }
 
 // SetGroupMemberInfo sets the information of a group member
@@ -822,7 +839,8 @@ func set_group_apply_member_friend(cCallback C.CB_S_I_S_S, operationID, cGroupID
 //export get_group_member_list
 func get_group_member_list(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cFilter, cOffset, cCount C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetGroupMemberList(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cFilter), int32(cOffset), int32(cCount))
+	open_im_sdk.GetGroupMemberList(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cFilter),
+		int32(cOffset), int32(cCount))
 }
 
 // GetGroupMemberOwnerAndAdmin retrieves the owner and admin members of a group
@@ -836,9 +854,11 @@ func get_group_member_owner_and_admin(cCallback C.CB_S_I_S_S, operationID, cGrou
 // GetGroupMemberListByJoinTimeFilter retrieves the list of group members filtered by join time
 //
 //export get_group_member_list_by_join_time_filter
-func get_group_member_list_by_join_time_filter(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cOffset, cCount C.int, cJoinTimeBegin, cJoinTimeEnd C.longlong, cFilterUserIDList *C.char) {
+func get_group_member_list_by_join_time_filter(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cOffset,
+	cCount C.int, cJoinTimeBegin, cJoinTimeEnd C.longlong, cFilterUserIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cOffset), int32(cCount), int64(cJoinTimeBegin), int64(cJoinTimeEnd), C.GoString(cFilterUserIDList))
+	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		int32(cOffset), int32(cCount), int64(cJoinTimeBegin), int64(cJoinTimeEnd), C.GoString(cFilterUserIDList))
 }
 
 // GetSpecifiedGroupMembersInfo retrieves the information of specified group members
@@ -846,7 +866,8 @@ func get_group_member_list_by_join_time_filter(cCallback C.CB_S_I_S_S, operation
 //export get_specified_group_members_info
 func get_specified_group_members_info(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserIDList))
+	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cUserIDList))
 }
 
 // KickGroupMember kicks group members
@@ -854,7 +875,8 @@ func get_specified_group_members_info(cCallback C.CB_S_I_S_S, operationID, cGrou
 //export kick_group_member
 func kick_group_member(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, cUserIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.KickGroupMember(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason), C.GoString(cUserIDList))
+	open_im_sdk.KickGroupMember(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
+		C.GoString(cUserIDList))
 }
 
 // TransferGroupOwner transfers the ownership of a group
@@ -862,7 +884,8 @@ func kick_group_member(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, c
 //export transfer_group_owner
 func transfer_group_owner(cCallback C.CB_S_I_S_S, operationID, cGroupID, cNewOwnerUserID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.TransferGroupOwner(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cNewOwnerUserID))
+	open_im_sdk.TransferGroupOwner(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cNewOwnerUserID))
 }
 
 // InviteUserToGroup invites users to a group
@@ -870,7 +893,8 @@ func transfer_group_owner(cCallback C.CB_S_I_S_S, operationID, cGroupID, cNewOwn
 //export invite_user_to_group
 func invite_user_to_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, cUserIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.InviteUserToGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason), C.GoString(cUserIDList))
+	open_im_sdk.InviteUserToGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
+		C.GoString(cUserIDList))
 }
 
 // GetGroupApplicationListAsRecipient retrieves the group application list as a recipient
@@ -894,7 +918,8 @@ func get_group_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID
 //export accept_group_application
 func accept_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.AcceptGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cFromUserID), C.GoString(cHandleMsg))
+	open_im_sdk.AcceptGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cFromUserID), C.GoString(cHandleMsg))
 }
 
 // RefuseGroupApplication refuses a group application
@@ -902,7 +927,8 @@ func accept_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 //export refuse_group_application
 func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cFromUserID), C.GoString(cHandleMsg))
+	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cFromUserID), C.GoString(cHandleMsg))
 }
 
 // SetGroupMemberNickname sets the nickname of a group member
@@ -910,7 +936,8 @@ func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 //export set_group_member_nickname
 func set_group_member_nickname(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID, cGroupMemberNickname *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID), C.GoString(cGroupMemberNickname))
+	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+		C.GoString(cUserID), C.GoString(cGroupMemberNickname))
 }
 
 // SearchGroupMembers searches for group members
