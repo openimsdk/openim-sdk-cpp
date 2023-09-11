@@ -19,6 +19,9 @@ type Base struct {
 	ErrCode int32  `json:"errCode"`
 	ErrMsg  string `json:"errMsg"`
 }
+
+// =====================================================listener===============================================
+
 type ConnCallback struct {
 	cCallback C.CB_I_S
 }
@@ -47,6 +50,246 @@ func (c ConnCallback) OnKickedOffline() {
 
 func (c ConnCallback) OnUserTokenExpired() {
 	C.Call_CB_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_DATA)
+}
+
+type ConversationCallback struct {
+	cCallback C.CB_I_S
+}
+
+func NewConversationCallback(cCallback C.CB_I_S) *ConversationCallback {
+	return &ConversationCallback{cCallback: cCallback}
+}
+
+func (c ConversationCallback) OnSyncServerStart() {
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, NO_DATA)
+}
+
+func (c ConversationCallback) OnSyncServerFinish() {
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, NO_DATA)
+}
+
+func (c ConversationCallback) OnSyncServerFailed() {
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, NO_DATA)
+}
+
+func (c ConversationCallback) OnNewConversation(conversationList string) {
+	C.Call_CB_I_S(c.cCallback, NEW_CONVERSATION, C.CString(conversationList))
+}
+
+func (c ConversationCallback) OnConversationChanged(conversationList string) {
+	C.Call_CB_I_S(c.cCallback, CONVERSATION_CHANGED, C.CString(conversationList))
+}
+
+func (c ConversationCallback) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
+	C.Call_CB_I_S(c.cCallback, TOTAL_UNREAD_MESSAGE_COUNT_CHANGED, C.CString(Int32ToString(totalUnreadCount)))
+}
+
+type AdvancedMsgCallback struct {
+	cCallback C.CB_I_S
+}
+
+func (a AdvancedMsgCallback) OnRecvNewMessage(message string) {
+	C.Call_CB_I_S(a.cCallback, RECV_NEW_MESSAGE, C.CString(message))
+}
+
+func (a AdvancedMsgCallback) OnRecvC2CReadReceipt(msgReceiptList string) {
+	C.Call_CB_I_S(a.cCallback, RECV_C2C_READ_RECEIPT, C.CString(msgReceiptList))
+}
+
+func (a AdvancedMsgCallback) OnRecvGroupReadReceipt(groupMsgReceiptList string) {
+	C.Call_CB_I_S(a.cCallback, RECV_GROUP_READ_RECEIPT, C.CString(groupMsgReceiptList))
+}
+
+func (a AdvancedMsgCallback) OnNewRecvMessageRevoked(messageRevoked string) {
+	C.Call_CB_I_S(a.cCallback, NEW_RECV_MESSAGE_REVOKED, C.CString(messageRevoked))
+}
+
+func (a AdvancedMsgCallback) OnRecvMessageExtensionsChanged(msgID string, reactionExtensionList string) {
+	m := make(map[string]string)
+	m["msgID"] = msgID
+	m["reactionExtensionList"] = reactionExtensionList
+	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_CHANGED, C.CString(StructToJsonString(m)))
+}
+
+func (a AdvancedMsgCallback) OnRecvMessageExtensionsDeleted(msgID string, reactionExtensionKeyList string) {
+	m := make(map[string]string)
+	m["msgID"] = msgID
+	m["reactionExtensionKeyList"] = reactionExtensionKeyList
+	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_DELETED, C.CString(StructToJsonString(m)))
+}
+
+func (a AdvancedMsgCallback) OnRecvMessageExtensionsAdded(msgID string, reactionExtensionList string) {
+	m := make(map[string]string)
+	m["msgID"] = msgID
+	m["reactionExtensionList"] = reactionExtensionList
+	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_ADDED, C.CString(StructToJsonString(m)))
+}
+
+func (a AdvancedMsgCallback) OnRecvOfflineNewMessage(message string) {
+	C.Call_CB_I_S(a.cCallback, RECV_OFFLINE_NEW_MESSAGE, C.CString(message))
+}
+
+func (a AdvancedMsgCallback) OnMsgDeleted(message string) {
+	C.Call_CB_I_S(a.cCallback, MSG_DELETED, C.CString(message))
+}
+
+func NewAdvancedMsgCallback(cCallback C.CB_I_S) *AdvancedMsgCallback {
+	return &AdvancedMsgCallback{cCallback: cCallback}
+}
+
+type BatchMessageCallback struct {
+	cCallback C.CB_I_S
+}
+
+func (b BatchMessageCallback) OnRecvNewMessages(messageList string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b BatchMessageCallback) OnRecvOfflineNewMessages(messageList string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewBatchMessageCallback(cCallback C.CB_I_S) *BatchMessageCallback {
+	return &BatchMessageCallback{cCallback: cCallback}
+}
+
+type FriendCallback struct {
+	cCallback C.CB_I_S
+}
+
+func (f FriendCallback) OnFriendApplicationAdded(friendApplication string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendApplicationDeleted(friendApplication string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendApplicationAccepted(friendApplication string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendApplicationRejected(friendApplication string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendAdded(friendInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendDeleted(friendInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnFriendInfoChanged(friendInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnBlackAdded(blackInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f FriendCallback) OnBlackDeleted(blackInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewFriendCallback(cCallback C.CB_I_S) *FriendCallback {
+	return &FriendCallback{cCallback: cCallback}
+}
+
+type GroupCallback struct {
+	cCallback C.CB_I_S
+}
+
+func NewGroupCallback(cCallback C.CB_I_S) *GroupCallback {
+	return &GroupCallback{cCallback: cCallback}
+}
+
+func (g GroupCallback) OnJoinedGroupAdded(groupInfo string) {
+	C.Call_CB_I_S(g.cCallback, JOINED_GROUP_ADDED, C.CString(groupInfo))
+
+}
+
+func (g GroupCallback) OnJoinedGroupDeleted(groupInfo string) {
+	C.Call_CB_I_S(g.cCallback, JOINED_GROUP_DELETED, C.CString(groupInfo))
+}
+
+func (g GroupCallback) OnGroupMemberAdded(groupMemberInfo string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_ADDED, C.CString(groupMemberInfo))
+}
+
+func (g GroupCallback) OnGroupMemberDeleted(groupMemberInfo string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_DELETED, C.CString(groupMemberInfo))
+}
+
+func (g GroupCallback) OnGroupApplicationAdded(groupApplication string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_ADDED, C.CString(groupApplication))
+}
+
+func (g GroupCallback) OnGroupApplicationDeleted(groupApplication string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_DELETED, C.CString(groupApplication))
+}
+
+func (g GroupCallback) OnGroupInfoChanged(groupInfo string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_INFO_CHANGED, C.CString(groupInfo))
+}
+
+func (g GroupCallback) OnGroupDismissed(groupInfo string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_DISMISSED, C.CString(groupInfo))
+}
+
+func (g GroupCallback) OnGroupMemberInfoChanged(groupMemberInfo string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_INFO_CHANGED, C.CString(groupMemberInfo))
+}
+
+func (g GroupCallback) OnGroupApplicationAccepted(groupApplication string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_ACCEPTED, C.CString(groupApplication))
+}
+
+func (g GroupCallback) OnGroupApplicationRejected(groupApplication string) {
+	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_REJECTED, C.CString(groupApplication))
+}
+
+type CustomBusinessCallback struct {
+	cCallback C.CB_I_S
+}
+
+func (c CustomBusinessCallback) OnRecvCustomBusinessMessage(businessMessage string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewCustomBusinessCallback(cCallback C.CB_I_S) *CustomBusinessCallback {
+	return &CustomBusinessCallback{cCallback: cCallback}
+}
+
+type UserCallback struct {
+	cCallback C.CB_I_S
+}
+
+func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u UserCallback) OnUserStatusChanged(statusMap string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewUserCallback(cCallback C.CB_I_S) *UserCallback {
+	return &UserCallback{cCallback: cCallback}
 }
 
 type SendMessageCallback struct {
@@ -86,6 +329,50 @@ func (b BaseCallback) OnError(errCode int32, errMsg string) {
 func (b BaseCallback) OnSuccess(data string) {
 	C.Call_CB_S_I_S_S(b.cCallback, b.operationID, NO_ERR, NO_ERR_MSG, C.CString(data))
 }
+
+// =====================================================global_callback===============================================
+
+//export set_group_listener
+func set_group_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetGroupListener(NewGroupCallback(cCallback))
+}
+
+//export set_conversation_listener
+func set_conversation_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetConversationListener(NewConversationCallback(cCallback))
+}
+
+//export set_advanced_msg_listener
+func set_advanced_msg_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetAdvancedMsgListener(NewAdvancedMsgCallback(cCallback))
+}
+
+//export set_batch_msg_listener
+func set_batch_msg_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetBatchMsgListener(NewBatchMessageCallback(cCallback))
+}
+
+//export set_user_listener
+func set_user_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetUserListener(NewUserCallback(cCallback))
+}
+
+//export set_friend_listener
+func set_friend_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetFriendListener(NewFriendCallback(cCallback))
+}
+
+//export set_custom_business_listener
+func set_custom_business_listener(cCallback C.CB_I_S) {
+	open_im_sdk.SetCustomBusinessListener(NewCustomBusinessCallback(cCallback))
+}
+
+////export set_messsage_kv_listener
+//func set_messsage_kv_listener(cCallback C.CB_I_S) {
+//	open_im_sdk.SetMessageKvInfoListener(NewMessageKVCallback(cCallback))
+//}
+
+// =====================================================conversation_msg===============================================
 
 //export  init_sdk
 func init_sdk(

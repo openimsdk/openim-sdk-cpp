@@ -8,6 +8,7 @@ import "C"
 
 import (
 	"encoding/json"
+	"strconv"
 	"unsafe"
 )
 
@@ -28,4 +29,7 @@ func FreeCString(strList ...*C.char) {
 	for _, str := range strList {
 		C.free(unsafe.Pointer(str))
 	}
+}
+func Int32ToString(intValue int32) string {
+	return strconv.Itoa(int(intValue))
 }
