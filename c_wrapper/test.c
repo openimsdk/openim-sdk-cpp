@@ -22,18 +22,17 @@ void c_conn_callback(int event, char *data)
   printf("C c_conn_callback receive from Go callbck code: %d,data: %s\n", event,data);
 
 }
-void c_base_callback(int errCode,char * errMsg,char *data)
+void c_base_callback(char * operationID ,int errCode,char * errMsg,char *data)
 {
-  printf("C c_base_callback  receive from Go callbck code: %d, errMsg: %s, data: %s\n", errCode,errMsg,data);
-
+  printf("C c_base_callback operationID: %s receive from Go callbck code: %d, errMsg: %s, data: %s\n", operationID, errCode, errMsg, data);
 }
 int main(int argc, char **argv)
 {
     char operationID[] = "12345";
 //    char uid[] = "6959062403";
-    char uid[] = "6959062403";
-//    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTU5MDYyNDAzIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAwNzIwOTg0LCJuYmYiOjE2OTI5NDQ2ODQsImlhdCI6MTY5Mjk0NDk4NH0.8otKTFrOCs8_ueV10rNOD-rzHrCT_EN0obKS9q79bIc";
-    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTU5MDYyNDAzIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAwNzIwOTg0LCJuYmYiOjE2OTI5NDQ2ODQsImlhdCI6MTY5Mjk0NDk4NH0.8otKTFrOCs8_ueV10rNOD-rzHrCT_EN0obKS9q79bIc";
+    char uid[] = "4365007572";
+    //    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTU5MDYyNDAzIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAwNzIwOTg0LCJuYmYiOjE2OTI5NDQ2ODQsImlhdCI6MTY5Mjk0NDk4NH0.8otKTFrOCs8_ueV10rNOD-rzHrCT_EN0obKS9q79bIc";
+    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI0MzY1MDA3NTcyIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAxNzYzODQ1LCJuYmYiOjE2OTM5ODc1NDUsImlhdCI6MTY5Mzk4Nzg0NX0.wK4f-R_iuyX7i6gelO2_smob50bdR_2s6FnMvb3xA6U";
 
     char *jsonString = "{\"platformID\": 3, \"apiAddr\": \"http://125.124.195.201:10002\", \"wsAddr\":\"ws://125.124.195.201:10001\",\"dataDir\": \"./\", \"logLevel\": 1, \"isLogStandardOutput\": true, \"logFilePath\": \"./\", \"isExternalExtensions\": true}";
 
