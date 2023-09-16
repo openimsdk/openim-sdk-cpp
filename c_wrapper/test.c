@@ -46,10 +46,11 @@ int main(int argc, char **argv)
     char* loginUserID=get_login_user();
 
         printf("return :%s\n",loginUserID);
-
-    char* message = create_text_message(operationID,"哈哈");
+    char operationID1[] = "12345,create";
+    char *message = create_text_message(operationID1, "哈哈");
     printf("return :%s\n",message);
-    get_all_conversation_list(c_base_callback,operationID);
+    char operationID2[] = "12345,get_all_conversation_list";
+    get_all_conversation_list(c_base_callback, operationID2);
 
     sleep(1000000);
     return 0;

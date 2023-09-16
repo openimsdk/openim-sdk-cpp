@@ -294,40 +294,40 @@ func NewUserCallback(cCallback C.CB_I_S) *UserCallback {
 
 type SendMessageCallback struct {
 	cCallback   C.CB_S_I_S_S_I
-	operationID *C.char
+	operationID string
 }
 
 func NewSendMessageCallback(cCallback C.CB_S_I_S_S_I, operationID *C.char) *SendMessageCallback {
-	return &SendMessageCallback{cCallback: cCallback, operationID: operationID}
+	return &SendMessageCallback{cCallback: cCallback, operationID: C.GoString(operationID)}
 }
 
 func (s SendMessageCallback) OnError(errCode int32, errMsg string) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, s.operationID, C.int(errCode), C.CString(errMsg), NO_DATA, NO_PROGRESS)
+	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), C.int(errCode), C.CString(errMsg), NO_DATA, NO_PROGRESS)
 }
 
 func (s SendMessageCallback) OnSuccess(data string) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, s.operationID, NO_ERR, NO_ERR_MSG, C.CString(data), NO_PROGRESS)
+	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), NO_ERR, NO_ERR_MSG, C.CString(data), NO_PROGRESS)
 }
 
 func (s SendMessageCallback) OnProgress(progress int) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, s.operationID, NO_ERR, NO_ERR_MSG, NO_DATA, C.int(progress))
+	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), NO_ERR, NO_ERR_MSG, NO_DATA, C.int(progress))
 }
 
 type BaseCallback struct {
 	cCallback   C.CB_S_I_S_S
-	operationID *C.char
+	operationID string
 }
 
 func NewBaseCallback(cCallback C.CB_S_I_S_S, operationID *C.char) *BaseCallback {
-	return &BaseCallback{cCallback: cCallback, operationID: operationID}
+	return &BaseCallback{cCallback: cCallback, operationID: C.GoString(operationID)}
 }
 
 func (b BaseCallback) OnError(errCode int32, errMsg string) {
-	C.Call_CB_S_I_S_S(b.cCallback, b.operationID, C.int(errCode), C.CString(errMsg), NO_DATA)
+	C.Call_CB_S_I_S_S(b.cCallback, C.CString(b.operationID), C.int(errCode), C.CString(errMsg), NO_DATA)
 }
 
 func (b BaseCallback) OnSuccess(data string) {
-	C.Call_CB_S_I_S_S(b.cCallback, b.operationID, NO_ERR, NO_ERR_MSG, C.CString(data))
+	C.Call_CB_S_I_S_S(b.cCallback, C.CString(b.operationID), NO_ERR, NO_ERR_MSG, C.CString(data))
 }
 
 // =====================================================global_callback===============================================
