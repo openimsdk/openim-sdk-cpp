@@ -430,7 +430,6 @@ func get_login_user() *C.char {
 //export  create_text_message
 func create_text_message(operationID, text *C.char) *C.char {
     message := C.CString(open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text)))
-    defer FreeCString(message)
     return message
 }
 
