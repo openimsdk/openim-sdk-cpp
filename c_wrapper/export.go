@@ -142,8 +142,7 @@ type BatchMessageCallback struct {
 }
 
 func (b BatchMessageCallback) OnRecvNewMessages(messageList string) {
-	//TODO implement me
-	panic("implement me")
+ 	C.Call_CB_I_S(b.cCallback, RECV_NEW_MESSAGES, C.CString(messageList))
 }
 
 func (b BatchMessageCallback) OnRecvOfflineNewMessages(messageList string) {
@@ -417,7 +416,9 @@ func get_login_user() *C.char {
 
 //export  create_text_message
 func create_text_message(operationID, text *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text)))
+	message:=C.CString(open_im_sdk.CreateTextMessage(C.GoString(operationID), C.GoString(text)))
+	defer FreeCString(message)
+	return message
 }
 
 //export create_advanced_text_message
