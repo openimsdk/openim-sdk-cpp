@@ -3,9 +3,18 @@ package main
 /*
 #include <stdio.h>
 #include <stdlib.h>
+typedef void (*CB_S)(char *);
 typedef void (*CB_I_S)(int,char *);
 typedef void (*CB_S_I_S_S)(char *,int,char *,char *);
 typedef void (*CB_S_I_S_S_I)(char *,int,char *,char *,int);
+
+CB_S DebugPrint;
+
+void Call_CB_S(CB_S func,char* data)
+{
+    func(data);
+}
+
 
 void Call_CB_I_S(CB_I_S func,int event,char* data)
 {
