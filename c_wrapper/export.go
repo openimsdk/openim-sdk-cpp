@@ -12,14 +12,6 @@ extern void Call_CB_S_I_S_S(CB_S_I_S_S func,char *,int errCode,char* errMsg,char
 extern void Call_CB_S_I_S_S_I(CB_S_I_S_S_I func,char *,int errCode,char* errMsg,char* data,int progress);
 extern CB_S DebugPrint;
 
-int CheckDebugPrint(){
-    if(DebugPrint == NULL){
-        return 0;
-    }else{
-        return 1;
-    }
-}
-
 */
 import "C"
 
@@ -33,9 +25,7 @@ func set_print(print C.CB_S) {
 }
 
 func DebugPrint(info string) {
-    if C.CheckDebugPrint() > 0 {
-        C.Call_CB_S(C.DebugPrint, C.CString(info))
-    }
+    C.Call_CB_S(C.DebugPrint, C.CString("DLL:"+info))
 }
 
 type Base struct {

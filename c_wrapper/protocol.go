@@ -12,12 +12,20 @@ CB_S DebugPrint;
 
 void Call_CB_S(CB_S func,char* data)
 {
+    if(func == NULL){
+        printf("callback func is null\n");
+        return;
+    }
     func(data);
 }
 
 
 void Call_CB_I_S(CB_I_S func,int event,char* data)
 {
+    if(func == NULL){
+        printf("callback func is null\n");
+        return;
+    }
     func(event,data);
     if (data != NULL && data[0] != '\0')
     {
@@ -27,6 +35,10 @@ void Call_CB_I_S(CB_I_S func,int event,char* data)
 }
 void Call_CB_S_I_S_S(CB_S_I_S_S func,char* operationID, int errCode,char* errMsg,char* data)
 {
+    if(func == NULL){
+        printf("callback func is null\n");
+        return;
+    }
     func(operationID,errCode,errMsg,data);
     if (errMsg != NULL && errMsg[0] != '\0')
     {
@@ -46,6 +58,10 @@ void Call_CB_S_I_S_S(CB_S_I_S_S func,char* operationID, int errCode,char* errMsg
 }
 void Call_CB_S_I_S_S_I(CB_S_I_S_S_I func,char* operationID,int errCode,char* errMsg,char* data,int progress)
 {
+    if(func == NULL){
+        printf("callback func is null\n");
+        return;
+    }
     func(operationID,errCode,errMsg,data,progress);
     if (errMsg != NULL && errMsg[0] != '\0')
     {
@@ -63,6 +79,7 @@ void Call_CB_S_I_S_S_I(CB_S_I_S_S_I func,char* operationID,int errCode,char* err
         free(operationID);
     }
 }
+
 enum CONN_EVENT{
    CONNECTING,
    CONNECT_SUCCESS,
