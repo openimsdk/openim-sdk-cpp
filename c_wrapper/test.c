@@ -47,12 +47,10 @@ int main(int argc, char **argv)
     GoUint8 init_result;
     init_result = init_sdk(c_conn_callback,operationID, jsonString);
     printf("init_result: %u\n", init_result);
-
-
-    login(c_base_callback, operationID, uid, token);
-    sleep(10);
     set_conversation_listener(c_conversation_callback);
     set_advanced_msg_listener(c_message_callback);
+    login(c_base_callback, operationID, uid, token);
+    sleep(10);
     //    char text[] = "哈哈";
     char* loginUserID=get_login_user();
 
