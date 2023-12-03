@@ -5,5 +5,5 @@ go build -buildmode=c-shared -trimpath -ldflags="-s -w" -o openimsdk.so export.g
 
 
 # build cpp sdk
-# rm ./openimsdkcc.so
-# g++ -fPIC -shared -o openimsdkcc.so openimsdkcc.cc ./openimsdk.so
+rm ./openimsdkcc.so
+g++ -fPIC -shared -o openimsdkcc.so openimsdkcc.cc ./openimsdk.so
