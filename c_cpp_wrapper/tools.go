@@ -13,10 +13,7 @@ import (
 )
 
 func parseBool(b int) bool {
-	if b == 1 {
-		return true
-	}
-	return false
+	return !(b == 0)
 }
 
 func StructToJsonString(param interface{}) string {

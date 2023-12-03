@@ -1,6 +1,8 @@
 {
     "files.associations": {
-        "stdio.h": "c",
-        "c_wrapper.h": "c"
-    }
+        "ostream": "cpp",
+        "chrono": "cpp",
+        "thread": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

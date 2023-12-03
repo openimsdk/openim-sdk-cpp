@@ -38,11 +38,11 @@ int main(int argc, char **argv)
 {
     char operationID[] = "12345";
 //    char uid[] = "6959062403";
-    char uid[] = "4365007572";
+    char uid[] = "openIM123";
     //    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTU5MDYyNDAzIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAwNzIwOTg0LCJuYmYiOjE2OTI5NDQ2ODQsImlhdCI6MTY5Mjk0NDk4NH0.8otKTFrOCs8_ueV10rNOD-rzHrCT_EN0obKS9q79bIc";
-    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI0MzY1MDA3NTcyIiwiUGxhdGZvcm1JRCI6MiwiZXhwIjoxNzAyNjk4NTkzLCJuYmYiOjE2OTQ5MjIyOTMsImlhdCI6MTY5NDkyMjU5M30.2Bp8lMgIWXZdPp4J_BWGqJ14gQqiHxGiICxfxrgAq-A";
+    char token[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJvcGVuSU0xMjMiLCJQbGF0Zm9ybUlEIjo2LCJleHAiOjE3MDkxMjQ2NzYsIm5iZiI6MTcwMTM0ODM3NiwiaWF0IjoxNzAxMzQ4Njc2fQ.EqlV5TlpiElYhUOHCEcSrZOWi9ldrUMR1L4q0blvxs0";
 
-        char *jsonString = "{\"platformID\": 2, \"apiAddr\": \"http://125.124.195.201:10002\", \"wsAddr\":\"ws://125.124.195.201:10001\",\"dataDir\": \"./\", \"logLevel\": 5, \"isLogStandardOutput\": true, \"logFilePath\": \"./\", \"isExternalExtensions\": true}";
+    char *jsonString = "{\"platformID\": 2, \"apiAddr\": \"http://14.29.168.56:10002\", \"wsAddr\":\"ws://14.29.168.56:10001\",\"dataDir\": \"./\", \"logLevel\": 5, \"isLogStandardOutput\": true, \"logFilePath\": \"./\", \"isExternalExtensions\": true}";
 
     GoUint8 init_result;
     init_result = init_sdk(c_conn_callback,operationID, jsonString);
