@@ -409,7 +409,7 @@ public:
 
 
   // create image message by URL
-  std::string CreateImageMessageByURL(const std::string& operationID, const std::string& sourcePicture, const std::string& bigPicture, const std::string& snapshotPicture);
+  std::string CreateImageMessageByURL(const std::string& operationID, const std::string& sourcePath,const std::string& sourcePicture, const std::string& bigPicture, const std::string& snapshotPicture);
 
   // create sound message by URL
   std::string CreateSoundMessageByURL(const std::string& operationID, const std::string& soundBaseInfo);

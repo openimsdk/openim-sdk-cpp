@@ -16,7 +16,7 @@ extern CB_S DebugPrint;
 import "C"
 
 import (
-	"open_im_sdk/open_im_sdk"
+	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk"
 )
 
 //export set_print
@@ -489,9 +489,9 @@ func create_image_message(operationID, imagePath *C.char) *C.char {
 }
 
 //export create_image_message_by_url
-func create_image_message_by_url(operationID, sourcePicture, bigPicture, snapshotPicture *C.char) *C.char {
-	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePicture),
-		C.GoString(bigPicture), C.GoString(snapshotPicture)))
+func create_image_message_by_url(operationID, sourcePath, sourcePicture, bigPicture, snapshotPicture *C.char) *C.char {
+	return C.CString(open_im_sdk.CreateImageMessageByURL(C.GoString(operationID), C.GoString(sourcePath),
+		C.GoString(sourcePicture), C.GoString(bigPicture), C.GoString(snapshotPicture)))
 }
 
 //export create_sound_message_by_url

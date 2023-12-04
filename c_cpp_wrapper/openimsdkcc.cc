@@ -273,13 +273,14 @@ std::string OpenIMManager::CreateImageMessage(const std::string& operationID, co
 }
 
 // create image message by URL
-std::string OpenIMManager::CreateImageMessageByURL(const std::string& operationID, const std::string& sourcePicture, const std::string& bigPicture, const std::string& snapshotPicture)
+std::string OpenIMManager::CreateImageMessageByURL(const std::string& operationID,const std::string& sourcePath, const std::string& sourcePicture, const std::string& bigPicture, const std::string& snapshotPicture)
 {
   char* operationID_cs=const_cast<char*>(operationID.c_str());
+  char* sourcePath_cs=const_cast<char*>(sourcePath.c_str());
   char* sourcePicture_cs=const_cast<char*>(sourcePicture.c_str());
   char* bigPicture_cs=const_cast<char*>(bigPicture.c_str());
   char* snapshotPicture_cs=const_cast<char*>(snapshotPicture.c_str());
-  char* result_cs=create_image_message_by_url(operationID_cs,sourcePicture_cs,bigPicture_cs,snapshotPicture_cs);
+  char* result_cs=create_image_message_by_url(operationID_cs,soundPath_cs,sourcePicture_cs,bigPicture_cs,snapshotPicture_cs);
   std::string result(result_cs);
   free(result_cs);
   return result;
