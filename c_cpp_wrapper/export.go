@@ -370,7 +370,7 @@ func set_custom_business_listener(cCallback C.CB_I_S) {
 //	open_im_sdk.SetMessageKvInfoListener(NewMessageKVCallback(cCallback))
 //}
 
-// =====================================================conversation_msg===============================================
+// =====================================================init_login===============================================
 
 //export  init_sdk
 func init_sdk(
@@ -397,6 +397,12 @@ func logout(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
 }
 
+//export set_app_background_status
+func set_app_background_status(cCallback C.CB_S_I_S_S, operationID *C.char, isBackground C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetAppBackgroundStatus(baseCallback, C.GoString(operationID), parseBool(int(isBackground)))
+}
+
 //export  network_status_changed
 func network_status_changed(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
@@ -412,6 +418,8 @@ func get_login_status(operationID *C.char) int {
 func get_login_user() *C.char {
 	return C.CString(open_im_sdk.GetLoginUserID())
 }
+
+// =====================================================conversation_msg===============================================
 
 //export  create_text_message
 func create_text_message(operationID, text *C.char) *C.char {
@@ -548,10 +556,99 @@ func get_all_conversation_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	open_im_sdk.GetAllConversationList(baseCallback, C.GoString(operationID))
 }
 
-//export get_advanced_history_message_list
-func get_advanced_history_message_list(cCallback C.CB_S_I_S_S, operationID, getMessageOptions *C.char) {
+//export get_conversation_list_split
+func get_conversation_list_split(cCallback C.CB_S_I_S_S, operationID *C.char, offset C.int, count C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
+	open_im_sdk.GetConversationListSplit(baseCallback, C.GoString(operationID), int(offset), int(count))
+}
+
+//export get_one_conversation
+func get_one_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, sessionType C.int, sourceID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetOneConversation(baseCallback, C.GoString(operationID), int32(sessionType), C.GoString(sourceID))
+}
+
+//export get_multiple_conversation
+func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationIDList *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetMultipleConversation(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
+}
+
+//export set_conversation_msg_destruct_time
+func set_conversation_msg_destruct_time(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, msgDestructTime C.longlong) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationMsgDestructTime(baseCallback, C.GoString(operationID), C.GoString(conversationID), int64(msgDestructTime))
+}
+
+//export set_conversation_is_msg_destruct
+func set_conversation_is_msg_destruct(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isMsgDestruct C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationIsMsgDestruct(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isMsgDestruct)))
+}
+
+//export hide_conversation
+func hide_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.HideConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export get_conversation_recv_message_opt
+func get_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationIDList *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
+}
+
+//export set_conversation_draft
+func set_conversation_draft(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, draftText *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationDraft(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(draftText))
+}
+
+//export reset_conversation_group_at_type
+func reset_conversation_group_at_type(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.ResetConversationGroupAtType(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export pin_conversation
+func pin_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPinned C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.PinConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isPinned)))
+}
+
+//export set_conversation_private_chat
+func set_conversation_private_chat(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPrivate C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationPrivateChat(baseCallback, C.GoString(operationID), C.GoString(conversationID),
+		parseBool(int(isPrivate)))
+}
+
+//export set_conversation_burn_duration
+func set_conversation_burn_duration(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, duration C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationBurnDuration(baseCallback, C.GoString(operationID), C.GoString(conversationID), int32(duration))
+}
+
+//export set_conversation_recv_message_opt
+func set_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, opt C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationID), int(opt))
+}
+
+//export get_total_unread_msg_count
+func get_total_unread_msg_count(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetTotalUnreadMsgCount(baseCallback, C.GoString(operationID))
+}
+
+//export get_at_all_tag
+func get_at_all_tag(operationID *C.char) *C.char {
+	return C.CString(open_im_sdk.GetAtAllTag(C.GoString(operationID)))
+}
+
+//export get_conversation_id_by_session_type
+func get_conversation_id_by_session_type(operationID *C.char, sourceID *C.char, sessionType C.int) *C.char {
+	return C.CString(open_im_sdk.GetConversationIDBySessionType(C.GoString(operationID), C.GoString(sourceID), int(sessionType)))
 }
 
 //export send_message
@@ -561,12 +658,127 @@ func send_message(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupI
 		C.GoString(groupID), C.GoString(offlinePushInfo))
 }
 
+//export send_message_not_oss
+func send_message_not_oss(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
+	open_im_sdk.SendMessageNotOss(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
+		C.GoString(groupID), C.GoString(offlinePushInfo))
+}
+
+//export find_message_list
+func find_message_list(cCallback C.CB_S_I_S_S, operationID *C.char, findMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.FindMessageList(baseCallback, C.GoString(operationID), C.GoString(findMessageOptions))
+}
+
+//export get_advanced_history_message_list
+func get_advanced_history_message_list(cCallback C.CB_S_I_S_S, operationID, getMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
+}
+
+//export get_advanced_history_message_list_reverse
+func get_advanced_history_message_list_reverse(cCallback C.CB_S_I_S_S, operationID *C.char, getMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetAdvancedHistoryMessageListReverse(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
+}
+
+//export revoke_message
+func revoke_message(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.RevokeMessage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
+}
+
+//export typing_status_update
+func typing_status_update(cCallback C.CB_S_I_S_S, operationID *C.char, recvID *C.char, msgTip *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.TypingStatusUpdate(baseCallback, C.GoString(operationID), C.GoString(recvID), C.GoString(msgTip))
+}
+
+//export mark_conversation_message_as_read
+func mark_conversation_message_as_read(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.MarkConversationMessageAsRead(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export delete_message_from_local_storage
+func delete_message_from_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.DeleteMessageFromLocalStorage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
+}
+
+//export delete_message
+func delete_message(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.DeleteMessage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
+}
+
+//export hide_all_conversations
+func hide_all_conversations(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.HideAllConversations(baseCallback, C.GoString(operationID))
+}
+
+//export delete_all_msg_from_local_and_svr
+func delete_all_msg_from_local_and_svr(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.DeleteAllMsgFromLocalAndSvr(baseCallback, C.GoString(operationID))
+}
+
+//export delete_all_msg_from_local
+func delete_all_msg_from_local(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.DeleteAllMsgFromLocal(baseCallback, C.GoString(operationID))
+}
+
+//export clear_conversation_and_delete_all_msg
+func clear_conversation_and_delete_all_msg(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.ClearConversationAndDeleteAllMsg(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export delete_conversation_and_delete_all_msg
+func delete_conversation_and_delete_all_msg(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.DeleteConversationAndDeleteAllMsg(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export insert_single_message_to_local_storage
+func insert_single_message_to_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, message *C.char, recvID *C.char, sendID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.InsertSingleMessageToLocalStorage(baseCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID), C.GoString(sendID))
+}
+
+//export insert_group_message_to_local_storage
+func insert_group_message_to_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, message *C.char, groupID *C.char, sendID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.InsertGroupMessageToLocalStorage(baseCallback, C.GoString(operationID), C.GoString(message), C.GoString(groupID), C.GoString(sendID))
+}
+
+//export search_local_messages
+func search_local_messages(cCallback C.CB_S_I_S_S, operationID *C.char, searchParam *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SearchLocalMessages(baseCallback, C.GoString(operationID), C.GoString(searchParam))
+}
+
+//export set_message_local_ex
+func set_message_local_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char, localEx *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetMessageLocalEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID), C.GoString(localEx))
+}
+
 // =====================================================user===============================================
-//
+
 //export get_users_info
 func get_users_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetUsersInfo(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+//export get_users_info_with_cache
+func get_users_info_with_cache(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char, groupID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetUsersInfoWithCache(baseCallback, C.GoString(operationID), C.GoString(userIDs), C.GoString(groupID))
 }
 
 //export get_users_info_from_srv
@@ -579,6 +791,12 @@ func get_users_info_from_srv(cCallback C.CB_S_I_S_S, operationID *C.char, userID
 func set_self_info(cCallback C.CB_S_I_S_S, operationID *C.char, userInfo *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetSelfInfo(baseCallback, C.GoString(operationID), C.GoString(userInfo))
+}
+
+//export set_global_recv_message_opt
+func set_global_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, opt C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetGlobalRecvMessageOpt(baseCallback, C.GoString(operationID), int(opt))
 }
 
 //export get_self_user_info
