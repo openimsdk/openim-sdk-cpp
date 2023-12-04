@@ -280,7 +280,7 @@ std::string OpenIMManager::CreateImageMessageByURL(const std::string& operationI
   char* sourcePicture_cs=const_cast<char*>(sourcePicture.c_str());
   char* bigPicture_cs=const_cast<char*>(bigPicture.c_str());
   char* snapshotPicture_cs=const_cast<char*>(snapshotPicture.c_str());
-  char* result_cs=create_image_message_by_url(operationID_cs,soundPath_cs,sourcePicture_cs,bigPicture_cs,snapshotPicture_cs);
+  char* result_cs=create_image_message_by_url(operationID_cs,sourcePath_cs,sourcePicture_cs,bigPicture_cs,snapshotPicture_cs);
   std::string result(result_cs);
   free(result_cs);
   return result;
