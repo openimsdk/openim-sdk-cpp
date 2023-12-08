@@ -49,7 +49,7 @@ void Call_CB_S_I_S_S(CB_S_I_S_S func,char* operationID, int errCode,char* errMsg
     func(operationID,errCode,errMsg,data);
     if (errMsg != NULL && errMsg[0] != '\0')
     {
-        printf("this is not null errmsg\n");
+        printf("this is not null errmsg %s\n",errMsg);
         free(errMsg);
     }
     if (data != NULL && data[0] != '\0')
