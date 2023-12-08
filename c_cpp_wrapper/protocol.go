@@ -46,6 +46,10 @@ void Call_CB_S_I_S_S(CB_S_I_S_S func,char* operationID, int errCode,char* errMsg
    if (strcmp(data, "\"\"") == 0) {
        strcpy(data, "");
     }
+   if (strlen(errMsg) != 0 && errMsg[strlen(errMsg) - 1] != '\0') {
+       printf("ttttt %s\n",errMsg);
+       strncat(errMsg, "\0", 1);
+   }
     func(operationID,errCode,errMsg,data);
     if (errMsg != NULL && errMsg[0] != '\0')
     {
