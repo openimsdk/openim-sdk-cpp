@@ -3,6 +3,7 @@ package main
 /*
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 typedef void (*CB_S)(char *);
 typedef void (*CB_I_S)(int,char *);
 typedef void (*CB_S_I_S_S)(char *,int,char *,char *);
@@ -26,6 +27,9 @@ void Call_CB_I_S(CB_I_S func,int event,char* data)
         printf("callback func is null\n");
         return;
     }
+    if (strcmp(data, "\"\"") == 0) {
+       strcpy(data, "");
+    }
     func(event,data);
     if (data != NULL && data[0] != '\0')
     {
@@ -38,6 +42,9 @@ void Call_CB_S_I_S_S(CB_S_I_S_S func,char* operationID, int errCode,char* errMsg
     if(func == NULL){
         printf("callback func is null\n");
         return;
+    }
+   if (strcmp(data, "\"\"") == 0) {
+       strcpy(data, "");
     }
     func(operationID,errCode,errMsg,data);
     if (errMsg != NULL && errMsg[0] != '\0')
@@ -61,6 +68,9 @@ void Call_CB_S_I_S_S_I(CB_S_I_S_S_I func,char* operationID,int errCode,char* err
     if(func == NULL){
         printf("callback func is null\n");
         return;
+    }
+    if(strcmp(data, "\"\"") == 0) {
+       strcpy(data, "");
     }
     func(operationID,errCode,errMsg,data,progress);
     if (errMsg != NULL && errMsg[0] != '\0')
