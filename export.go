@@ -2,382 +2,443 @@ package main
 
 /*
 #include <stdio.h>
-typedef void (*CB_S)(char *);
-typedef void (*CB_I_S)(int,char *);
-typedef void (*CB_S_I_S_S)(char *,int,char *,char *);
-typedef void (*CB_S_I_S_S_I)(char *,int,char *,char *,int);
-extern void Call_CB_S(CB_S func,char* data);
-extern void Call_CB_I_S(CB_I_S func,int event,char* data);
-extern void Call_CB_S_I_S_S(CB_S_I_S_S func,char *,int errCode,char* errMsg,char* data);
-extern void Call_CB_S_I_S_S_I(CB_S_I_S_S_I func,char *,int errCode,char* errMsg,char* data,int progress);
-extern CB_S DebugPrint;
-
+typedef void (*MessageHandler)(int id ,char* data);
+extern MessageHandler messageHandler;
+extern void CallMessageHandler(MessageHandler msgHandler,int id,char* data);
 */
 import "C"
 
 import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+	"strconv"
+
 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk"
 )
 
-//export set_print
-func set_print(print C.CB_S) {
-	C.DebugPrint = print
+//export SetMessageHandler
+func SetMessageHandler(handler C.MessageHandler) {
+	C.messageHandler = handler
 }
 
-func DebugPrint(info string) {
-	C.Call_CB_S(C.DebugPrint, C.CString("DLL:"+info))
+func DispatorMsg(msgId int, msg interface{}) {
+	t := reflect.TypeOf(msg)
+	kind := t.Kind()
+	if kind == reflect.Struct {
+		msgJson, err := json.Marshal(msg)
+		if err != nil {
+			C.CallMessageHandler(C.messageHandler, C.int(0), C.CString(fmt.Sprintf("Marshal Json Error :%s", err.Error())))
+		} else {
+			C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString((string(msgJson))))
+		}
+	} else if kind == reflect.String {
+		C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString(msg.(string)))
+	} else if kind == reflect.Int32 {
+		C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString(strconv.Itoa(msg.(int))))
+	}
 }
 
-type Base struct {
-	ErrCode int32  `json:"errCode"`
-	ErrMsg  string `json:"errMsg"`
+func parseBool(b int) bool {
+	return !(b == 0)
 }
 
 // =====================================================listener===============================================
 
 type ConnCallback struct {
-	cCallback C.CB_I_S
 }
 
-func NewConnCallback(cCallback C.CB_I_S) *ConnCallback {
-	return &ConnCallback{cCallback: cCallback}
+func NewConnCallback() *ConnCallback {
+	return &ConnCallback{}
 }
-
 func (c ConnCallback) OnConnecting() {
-	C.Call_CB_I_S(c.cCallback, CONNECTING, NO_DATA)
+	DispatorMsg(Msg_Connecting, Empty{})
 }
 
 func (c ConnCallback) OnConnectSuccess() {
-	C.Call_CB_I_S(c.cCallback, CONNECT_SUCCESS, NO_DATA)
+	DispatorMsg(Msg_ConnectSuccess, Empty{})
 }
 
 func (c ConnCallback) OnConnectFailed(errCode int32, errMsg string) {
-
-	C.Call_CB_I_S(c.cCallback, CONNECT_FAILED, C.CString(StructToJsonString(Base{ErrCode: errCode, ErrMsg: errMsg})))
-
+	DispatorMsg(Msg_ConectFailed, Error{ErrCode: errCode, ErrMsg: errMsg})
 }
 
 func (c ConnCallback) OnKickedOffline() {
-	C.Call_CB_I_S(c.cCallback, KICKED_OFFLINE, NO_DATA)
+	DispatorMsg(Msg_KickedOffline, Empty{})
 }
-
 func (c ConnCallback) OnUserTokenExpired() {
-	C.Call_CB_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_DATA)
+	DispatorMsg(Msg_UserTokenExpired, Empty{})
 }
 
 type ConversationCallback struct {
-	cCallback C.CB_I_S
 }
 
-func NewConversationCallback(cCallback C.CB_I_S) *ConversationCallback {
-	return &ConversationCallback{cCallback: cCallback}
+func NewConversationCallback() *ConversationCallback {
+	return &ConversationCallback{}
 }
-
 func (c ConversationCallback) OnSyncServerStart() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, NO_DATA)
+	DispatorMsg(Msg_SyncServerStart, Empty{})
 }
-
 func (c ConversationCallback) OnSyncServerFinish() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, NO_DATA)
+	DispatorMsg(Msg_SyncServerFinish, Empty{})
 }
-
 func (c ConversationCallback) OnSyncServerFailed() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, NO_DATA)
+	DispatorMsg(Msg_SyncServerFailed, Empty{})
 }
-
 func (c ConversationCallback) OnNewConversation(conversationList string) {
-	C.Call_CB_I_S(c.cCallback, NEW_CONVERSATION, C.CString(conversationList))
+	DispatorMsg(Msg_NewConversation, conversationList)
 }
-
 func (c ConversationCallback) OnConversationChanged(conversationList string) {
-	C.Call_CB_I_S(c.cCallback, CONVERSATION_CHANGED, C.CString(conversationList))
+	DispatorMsg(Msg_ConversationChanged, conversationList)
 }
-
 func (c ConversationCallback) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
-	C.Call_CB_I_S(c.cCallback, TOTAL_UNREAD_MESSAGE_COUNT_CHANGED, C.CString(Int32ToString(totalUnreadCount)))
+	DispatorMsg(Msg_TotalUnreadMessageCountChanged, totalUnreadCount)
 }
 
 type AdvancedMsgCallback struct {
-	cCallback C.CB_I_S
 }
 
 func (a AdvancedMsgCallback) OnRecvNewMessage(message string) {
-	C.Call_CB_I_S(a.cCallback, RECV_NEW_MESSAGE, C.CString(message))
+	DispatorMsg(Msg_Advanced_RecvNewMessage, message)
 }
-
 func (a AdvancedMsgCallback) OnRecvC2CReadReceipt(msgReceiptList string) {
-	C.Call_CB_I_S(a.cCallback, RECV_C2C_READ_RECEIPT, C.CString(msgReceiptList))
+	DispatorMsg(Msg_Advanced_RecvC2CReadReceipt, msgReceiptList)
 }
-
 func (a AdvancedMsgCallback) OnRecvGroupReadReceipt(groupMsgReceiptList string) {
-	C.Call_CB_I_S(a.cCallback, RECV_GROUP_READ_RECEIPT, C.CString(groupMsgReceiptList))
+	DispatorMsg(Msg_Advanced_RecvGroupReadReceipt, groupMsgReceiptList)
 }
-
 func (a AdvancedMsgCallback) OnNewRecvMessageRevoked(messageRevoked string) {
-	C.Call_CB_I_S(a.cCallback, NEW_RECV_MESSAGE_REVOKED, C.CString(messageRevoked))
+	DispatorMsg(Msg_Advanced_NewRecvMessageRevoked, messageRevoked)
 }
-
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsChanged(msgID string, reactionExtensionList string) {
-	m := make(map[string]string)
-	m["msgID"] = msgID
-	m["reactionExtensionList"] = reactionExtensionList
-	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_CHANGED, C.CString(StructToJsonString(m)))
+	DispatorMsg(Msg_Advanced_RecvMessageExtensionsChanged, MsgIDAndList{Id: msgID, List: reactionExtensionList})
 }
-
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsDeleted(msgID string, reactionExtensionKeyList string) {
-	m := make(map[string]string)
-	m["msgID"] = msgID
-	m["reactionExtensionKeyList"] = reactionExtensionKeyList
-	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_DELETED, C.CString(StructToJsonString(m)))
+	DispatorMsg(Msg_Advanced_RecvMessageExtensionsDeleted, MsgIDAndList{Id: msgID, List: reactionExtensionKeyList})
 }
-
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsAdded(msgID string, reactionExtensionList string) {
-	m := make(map[string]string)
-	m["msgID"] = msgID
-	m["reactionExtensionList"] = reactionExtensionList
-	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_ADDED, C.CString(StructToJsonString(m)))
+	DispatorMsg(Msg_Advanced_RecvMessageExtensionsAdded, MsgIDAndList{Id: msgID, List: reactionExtensionList})
 }
-
 func (a AdvancedMsgCallback) OnRecvOfflineNewMessage(message string) {
-	C.Call_CB_I_S(a.cCallback, RECV_OFFLINE_NEW_MESSAGE, C.CString(message))
+	DispatorMsg(Msg_Advanced_RecvOfflineNewMessage, message)
 }
-
 func (a AdvancedMsgCallback) OnMsgDeleted(message string) {
-	C.Call_CB_I_S(a.cCallback, MSG_DELETED, C.CString(message))
+	DispatorMsg(Msg_Advanced_MsgDeleted, message)
 }
 
-func NewAdvancedMsgCallback(cCallback C.CB_I_S) *AdvancedMsgCallback {
-	return &AdvancedMsgCallback{cCallback: cCallback}
+func NewAdvancedMsgCallback() *AdvancedMsgCallback {
+	return &AdvancedMsgCallback{}
 }
 
 type BatchMessageCallback struct {
-	cCallback C.CB_I_S
 }
 
 func (b BatchMessageCallback) OnRecvNewMessages(messageList string) {
-	C.Call_CB_I_S(b.cCallback, RECV_NEW_MESSAGES, C.CString(messageList))
+	DispatorMsg(Msg_Batch_RecvNewMessages, messageList)
 }
-
 func (b BatchMessageCallback) OnRecvOfflineNewMessages(messageList string) {
-	C.Call_CB_I_S(b.cCallback, RECV_OFFLINE_NEW_MESSAGES, C.CString(messageList))
+	DispatorMsg(Msg_Batch_RecvOfflineNewMessages, messageList)
 }
 
-func NewBatchMessageCallback(cCallback C.CB_I_S) *BatchMessageCallback {
-	return &BatchMessageCallback{cCallback: cCallback}
+func NewBatchMessageCallback() *BatchMessageCallback {
+	return &BatchMessageCallback{}
 }
 
 type FriendCallback struct {
-	cCallback C.CB_I_S
 }
 
 func (f FriendCallback) OnFriendApplicationAdded(friendApplication string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_APPLICATION_ADDED, C.CString(friendApplication))
+	DispatorMsg(Msg_FriendApplicationAdded, friendApplication)
 }
-
 func (f FriendCallback) OnFriendApplicationDeleted(friendApplication string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_APPLICATION_DELETED, C.CString(friendApplication))
+	DispatorMsg(Msg_FriendApplicationDeleted, friendApplication)
 }
-
 func (f FriendCallback) OnFriendApplicationAccepted(friendApplication string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_APPLICATION_ACCEPTED, C.CString(friendApplication))
+	DispatorMsg(Msg_FriendApplicationAccepted, friendApplication)
 }
-
 func (f FriendCallback) OnFriendApplicationRejected(friendApplication string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_APPLICATION_REJECTED, C.CString(friendApplication))
+	DispatorMsg(Msg_FriendApplicationRejected, friendApplication)
 }
-
 func (f FriendCallback) OnFriendAdded(friendInfo string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_ADDED, C.CString(friendInfo))
+	DispatorMsg(Msg_FriendAdded, friendInfo)
 }
-
 func (f FriendCallback) OnFriendDeleted(friendInfo string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_DELETED, C.CString(friendInfo))
+	DispatorMsg(Msg_FriendDeleted, friendInfo)
 }
-
 func (f FriendCallback) OnFriendInfoChanged(friendInfo string) {
-	C.Call_CB_I_S(f.cCallback, FRIEND_INFO_CHANGED, C.CString(friendInfo))
+	DispatorMsg(Msg_FriendInfoChanged, friendInfo)
 }
-
 func (f FriendCallback) OnBlackAdded(blackInfo string) {
-	C.Call_CB_I_S(f.cCallback, BLACK_ADDED, C.CString(blackInfo))
+	DispatorMsg(Msg_BlackAdded, blackInfo)
 }
-
 func (f FriendCallback) OnBlackDeleted(blackInfo string) {
-	C.Call_CB_I_S(f.cCallback, BLACK_DELETED, C.CString(blackInfo))
+	DispatorMsg(Msg_BlackDeleted, blackInfo)
 }
 
-func NewFriendCallback(cCallback C.CB_I_S) *FriendCallback {
-	return &FriendCallback{cCallback: cCallback}
+func NewFriendCallback() *FriendCallback {
+	return &FriendCallback{}
 }
 
 type GroupCallback struct {
-	cCallback C.CB_I_S
 }
 
-func NewGroupCallback(cCallback C.CB_I_S) *GroupCallback {
-	return &GroupCallback{cCallback: cCallback}
+func NewGroupCallback() *GroupCallback {
+	return &GroupCallback{}
 }
-
 func (g GroupCallback) OnJoinedGroupAdded(groupInfo string) {
-	C.Call_CB_I_S(g.cCallback, JOINED_GROUP_ADDED, C.CString(groupInfo))
+	DispatorMsg(Msg_JoinedGroupAdded, groupInfo)
 }
-
 func (g GroupCallback) OnJoinedGroupDeleted(groupInfo string) {
-	C.Call_CB_I_S(g.cCallback, JOINED_GROUP_DELETED, C.CString(groupInfo))
+	DispatorMsg(Msg_JoinedGroupDeleted, groupInfo)
 }
-
 func (g GroupCallback) OnGroupMemberAdded(groupMemberInfo string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_ADDED, C.CString(groupMemberInfo))
+	DispatorMsg(Msg_GroupMemberAdded, groupMemberInfo)
 }
-
 func (g GroupCallback) OnGroupMemberDeleted(groupMemberInfo string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_DELETED, C.CString(groupMemberInfo))
+	DispatorMsg(Msg_GroupMemberDeleted, groupMemberInfo)
 }
-
 func (g GroupCallback) OnGroupApplicationAdded(groupApplication string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_ADDED, C.CString(groupApplication))
+	DispatorMsg(Msg_GroupApplicationAdded, groupApplication)
 }
-
 func (g GroupCallback) OnGroupApplicationDeleted(groupApplication string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_DELETED, C.CString(groupApplication))
+	DispatorMsg(Msg_GroupApplicationDeleted, groupApplication)
 }
-
 func (g GroupCallback) OnGroupInfoChanged(groupInfo string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_INFO_CHANGED, C.CString(groupInfo))
+	DispatorMsg(Msg_GroupInfoChanged, groupInfo)
 }
-
 func (g GroupCallback) OnGroupDismissed(groupInfo string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_DISMISSED, C.CString(groupInfo))
+	DispatorMsg(Msg_GroupDismissed, groupInfo)
 }
-
 func (g GroupCallback) OnGroupMemberInfoChanged(groupMemberInfo string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_MEMBER_INFO_CHANGED, C.CString(groupMemberInfo))
+	DispatorMsg(Msg_GroupMemberInfoChanged, groupMemberInfo)
 }
-
 func (g GroupCallback) OnGroupApplicationAccepted(groupApplication string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_ACCEPTED, C.CString(groupApplication))
+	DispatorMsg(Msg_GroupApplicationAccepted, groupApplication)
 }
-
 func (g GroupCallback) OnGroupApplicationRejected(groupApplication string) {
-	C.Call_CB_I_S(g.cCallback, GROUP_APPLICATION_REJECTED, C.CString(groupApplication))
+	DispatorMsg(Msg_GroupApplicationRejected, groupApplication)
 }
 
 type CustomBusinessCallback struct {
-	cCallback C.CB_I_S
 }
 
 func (c CustomBusinessCallback) OnRecvCustomBusinessMessage(businessMessage string) {
-	C.Call_CB_I_S(c.cCallback, RECV_CUSTOM_BUSINESS_MESSAGE, C.CString(businessMessage))
+	DispatorMsg(Msg_RecvCustomBusinessMessage, businessMessage)
 }
-
-func NewCustomBusinessCallback(cCallback C.CB_I_S) *CustomBusinessCallback {
-	return &CustomBusinessCallback{cCallback: cCallback}
+func NewCustomBusinessCallback() *CustomBusinessCallback {
+	return &CustomBusinessCallback{}
 }
 
 type UserCallback struct {
-	cCallback C.CB_I_S
 }
 
 func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
-	C.Call_CB_I_S(u.cCallback, SELF_INFO_UPDATED, C.CString(userInfo))
+	DispatorMsg(Msg_SelfInfoUpdated, userInfo)
 }
 
 func (u UserCallback) OnUserStatusChanged(statusMap string) {
-	C.Call_CB_I_S(u.cCallback, USER_STATUS_CHANGED, C.CString(statusMap))
+	DispatorMsg(Msg_UserStatusChanged, statusMap)
 }
 
-func NewUserCallback(cCallback C.CB_I_S) *UserCallback {
-	return &UserCallback{cCallback: cCallback}
+func NewUserCallback() *UserCallback {
+	return &UserCallback{}
 }
 
 type SendMessageCallback struct {
-	cCallback   C.CB_S_I_S_S_I
 	operationID string
 }
 
-func NewSendMessageCallback(cCallback C.CB_S_I_S_S_I, operationID *C.char) *SendMessageCallback {
-	return &SendMessageCallback{cCallback: cCallback, operationID: C.GoString(operationID)}
+func NewSendMessageCallback(operationID *C.char) *SendMessageCallback {
+	return &SendMessageCallback{operationID: C.GoString(operationID)}
 }
 
 func (s SendMessageCallback) OnError(errCode int32, errMsg string) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), C.int(errCode), C.CString(errMsg), NO_DATA, NO_PROGRESS)
+	DispatorMsg(Msg_SendMessage_Error, Error{ErrCode: errCode, ErrMsg: errMsg, OperationID: s.operationID})
 }
 
 func (s SendMessageCallback) OnSuccess(data string) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), NO_ERR, NO_ERR_MSG, C.CString(data), NO_PROGRESS)
+	DispatorMsg(Msg_SendMessage_Success, Success{OperationID: s.operationID, Data: data})
 }
 
 func (s SendMessageCallback) OnProgress(progress int) {
-	C.Call_CB_S_I_S_S_I(s.cCallback, C.CString(s.operationID), NO_ERR, NO_ERR_MSG, NO_DATA, C.int(progress))
+	DispatorMsg(Msg_SendMessage_Progress, Progress{OperationID: s.operationID, Progress: progress})
 }
 
 type BaseCallback struct {
-	cCallback   C.CB_S_I_S_S
 	operationID string
 }
 
-func NewBaseCallback(cCallback C.CB_S_I_S_S, operationID *C.char) *BaseCallback {
-	return &BaseCallback{cCallback: cCallback, operationID: C.GoString(operationID)}
+func NewBaseCallback(operationID *C.char) *BaseCallback {
+	return &BaseCallback{operationID: C.GoString(operationID)}
 }
-
 func (b BaseCallback) OnError(errCode int32, errMsg string) {
-	C.Call_CB_S_I_S_S(b.cCallback, C.CString(b.operationID), C.int(errCode), C.CString(errMsg), NO_DATA)
+	DispatorMsg(Msg_Base_Error, Error{OperationID: b.operationID, ErrCode: errCode, ErrMsg: errMsg})
 }
-
 func (b BaseCallback) OnSuccess(data string) {
-	C.Call_CB_S_I_S_S(b.cCallback, C.CString(b.operationID), NO_ERR, NO_ERR_MSG, C.CString(data))
+	DispatorMsg(Msg_Base_Success, Success{OperationID: b.operationID, Data: data})
 }
 
-// =====================================================global_callback===============================================
-
-//export set_group_listener
-func set_group_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetGroupListener(NewGroupCallback(cCallback))
+type GroupListener struct {
 }
 
-//export set_conversation_listener
-func set_conversation_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetConversationListener(NewConversationCallback(cCallback))
+func (GroupListener) OnGroupApplicationAccepted(groupApplication string) {
+
+}
+func (GroupListener) OnGroupApplicationAdded(groupApplication string) {
+}
+func (GroupListener) OnGroupApplicationDeleted(groupApplication string) {
 }
 
-//export set_advanced_msg_listener
-func set_advanced_msg_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetAdvancedMsgListener(NewAdvancedMsgCallback(cCallback))
+func (GroupListener) OnGroupApplicationRejected(groupApplication string) {
 }
 
-//export set_batch_msg_listener
-func set_batch_msg_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetBatchMsgListener(NewBatchMessageCallback(cCallback))
+func (GroupListener) OnGroupDismissed(groupInfo string) {
 }
 
-//export set_user_listener
-func set_user_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetUserListener(NewUserCallback(cCallback))
+func (GroupListener) OnGroupInfoChanged(groupInfo string) {
 }
 
-//export set_friend_listener
-func set_friend_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetFriendListener(NewFriendCallback(cCallback))
+func (GroupListener) OnGroupMemberAdded(groupMemberInfo string) {
+}
+func (GroupListener) OnGroupMemberDeleted(groupMemberInfo string) {
+}
+func (GroupListener) OnGroupMemberInfoChanged(groupMemberInfo string) {
 }
 
-//export set_custom_business_listener
-func set_custom_business_listener(cCallback C.CB_I_S) {
-	open_im_sdk.SetCustomBusinessListener(NewCustomBusinessCallback(cCallback))
+func (GroupListener) OnJoinedGroupAdded(groupInfo string) {
 }
 
-////export set_messsage_kv_listener
-//func set_messsage_kv_listener(cCallback C.CB_I_S) {
-//	open_im_sdk.SetMessageKvInfoListener(NewMessageKVCallback(cCallback))
-//}
+func (GroupListener) OnJoinedGroupDeleted(groupInfo string) {
+}
+
+type ConversationListener struct {
+}
+
+func (ConversationListener) OnConversationChanged(conversationList string) {
+}
+func (ConversationListener) OnNewConversation(conversationList string) {
+}
+func (ConversationListener) OnSyncServerFailed() {
+}
+func (ConversationListener) OnSyncServerFinish() {
+}
+func (ConversationListener) OnSyncServerStart() {
+}
+
+func (ConversationListener) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
+}
+
+type AdvancedMsgListener struct {
+}
+
+func (AdvancedMsgListener) OnMsgDeleted(message string) {
+}
+func (AdvancedMsgListener) OnNewRecvMessageRevoked(messageRevoked string) {
+}
+func (AdvancedMsgListener) OnRecvC2CReadReceipt(msgReceiptList string) {
+}
+func (AdvancedMsgListener) OnRecvGroupReadReceipt(groupMsgReceiptList string) {
+}
+func (AdvancedMsgListener) OnRecvMessageExtensionsAdded(msgID string, reactionExtensionList string) {
+}
+func (AdvancedMsgListener) OnRecvMessageExtensionsChanged(msgID string, reactionExtensionList string) {
+}
+func (AdvancedMsgListener) OnRecvMessageExtensionsDeleted(msgID string, reactionExtensionKeyList string) {
+}
+func (AdvancedMsgListener) OnRecvNewMessage(message string) {
+}
+func (AdvancedMsgListener) OnRecvOfflineNewMessage(message string) {
+}
+
+type BatchMsgListener struct {
+}
+
+func (BatchMsgListener) OnRecvNewMessages(messageList string) {
+}
+
+func (BatchMsgListener) OnRecvOfflineNewMessages(messageList string) {
+}
+
+type UserListener struct {
+}
+
+func (UserListener) OnSelfInfoUpdated(userInfo string) {
+}
+
+func (UserListener) OnUserStatusChanged(userOnlineStatus string) {
+
+}
+
+type FriendListener struct {
+}
+
+func (FriendListener) OnBlackAdded(blackInfo string) {
+
+}
+
+func (FriendListener) OnBlackDeleted(blackInfo string) {
+
+}
+
+func (FriendListener) OnFriendAdded(friendInfo string) {
+
+}
+
+func (FriendListener) OnFriendApplicationAccepted(friendApplication string) {
+
+}
+
+func (FriendListener) OnFriendApplicationAdded(friendApplication string) {
+
+}
+
+func (FriendListener) OnFriendApplicationDeleted(friendApplication string) {
+
+}
+
+func (FriendListener) OnFriendApplicationRejected(friendApplication string) {
+
+}
+
+func (FriendListener) OnFriendDeleted(friendInfo string) {
+
+}
+
+func (FriendListener) OnFriendInfoChanged(friendInfo string) {
+
+}
+
+type CustomBusinessListener struct {
+}
+
+func (CustomBusinessListener) OnRecvCustomBusinessMessage(businessMessage string) {
+
+}
+
+type MessageKvInfoListener struct {
+}
+
+func (MessageKvInfoListener) OnMessageKvInfoChanged(messageChangedList string) {
+
+}
 
 // =====================================================init_login===============================================
 
 //export  init_sdk
 func init_sdk(
-	cCallback C.CB_I_S,
 	operationID *C.char, config *C.char) bool {
-	callback := NewConnCallback(cCallback)
-	return open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
+	callback := NewConnCallback()
+	res := open_im_sdk.InitSDK(callback, C.GoString(operationID), C.GoString(config))
+	if res {
+		open_im_sdk.SetGroupListener(NewGroupCallback())
+		open_im_sdk.SetConversationListener(NewConversationCallback())
+		open_im_sdk.SetAdvancedMsgListener(NewAdvancedMsgCallback())
+		open_im_sdk.SetBatchMsgListener(NewBatchMessageCallback())
+		open_im_sdk.SetUserListener(NewUserCallback())
+		open_im_sdk.SetFriendListener(NewFriendCallback())
+		open_im_sdk.SetCustomBusinessListener(NewCustomBusinessCallback())
+	}
+	return res
 }
 
 //export un_init_sdk
@@ -386,26 +447,26 @@ func un_init_sdk(operationID *C.char) {
 }
 
 //export  login
-func login(cCallback C.CB_S_I_S_S, operationID, uid, token *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func login(operationID, uid, token *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.Login(baseCallback, C.GoString(operationID), C.GoString(uid), C.GoString(token))
 }
 
 //export  logout
-func logout(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func logout(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
 }
 
 //export set_app_background_status
-func set_app_background_status(cCallback C.CB_S_I_S_S, operationID *C.char, isBackground C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_app_background_status(operationID *C.char, isBackground C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetAppBackgroundStatus(baseCallback, C.GoString(operationID), parseBool(int(isBackground)))
 }
 
 //export  network_status_changed
-func network_status_changed(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func network_status_changed(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.NetworkStatusChanged(baseCallback, C.GoString(operationID))
 }
 
@@ -551,93 +612,93 @@ func create_forward_message(operationID, m *C.char) *C.char {
 }
 
 //export get_all_conversation_list
-func get_all_conversation_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_all_conversation_list(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetAllConversationList(baseCallback, C.GoString(operationID))
 }
 
 //export get_conversation_list_split
-func get_conversation_list_split(cCallback C.CB_S_I_S_S, operationID *C.char, offset C.int, count C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_conversation_list_split(operationID *C.char, offset C.int, count C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetConversationListSplit(baseCallback, C.GoString(operationID), int(offset), int(count))
 }
 
 //export get_one_conversation
-func get_one_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, sessionType C.int, sourceID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_one_conversation(operationID *C.char, sessionType C.int, sourceID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetOneConversation(baseCallback, C.GoString(operationID), int32(sessionType), C.GoString(sourceID))
 }
 
 //export get_multiple_conversation
-func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_multiple_conversation(operationID *C.char, conversationIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetMultipleConversation(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
 }
 
 //export set_conversation_msg_destruct_time
-func set_conversation_msg_destruct_time(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, msgDestructTime C.longlong) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_msg_destruct_time(operationID *C.char, conversationID *C.char, msgDestructTime C.longlong) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationMsgDestructTime(baseCallback, C.GoString(operationID), C.GoString(conversationID), int64(msgDestructTime))
 }
 
 //export set_conversation_is_msg_destruct
-func set_conversation_is_msg_destruct(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isMsgDestruct C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_is_msg_destruct(operationID *C.char, conversationID *C.char, isMsgDestruct C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationIsMsgDestruct(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isMsgDestruct)))
 }
 
 //export hide_conversation
-func hide_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func hide_conversation(operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.HideConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
 //export get_conversation_recv_message_opt
-func get_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_conversation_recv_message_opt(operationID *C.char, conversationIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
 }
 
 //export set_conversation_draft
-func set_conversation_draft(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, draftText *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_draft(operationID *C.char, conversationID *C.char, draftText *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationDraft(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(draftText))
 }
 
 //export reset_conversation_group_at_type
-func reset_conversation_group_at_type(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func reset_conversation_group_at_type(operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.ResetConversationGroupAtType(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
 //export pin_conversation
-func pin_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPinned C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func pin_conversation(operationID *C.char, conversationID *C.char, isPinned C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.PinConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isPinned)))
 }
 
 //export set_conversation_private_chat
-func set_conversation_private_chat(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPrivate C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_private_chat(operationID *C.char, conversationID *C.char, isPrivate C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationPrivateChat(baseCallback, C.GoString(operationID), C.GoString(conversationID),
 		parseBool(int(isPrivate)))
 }
 
 //export set_conversation_burn_duration
-func set_conversation_burn_duration(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, duration C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_burn_duration(operationID *C.char, conversationID *C.char, duration C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationBurnDuration(baseCallback, C.GoString(operationID), C.GoString(conversationID), int32(duration))
 }
 
 //export set_conversation_recv_message_opt
-func set_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, opt C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_conversation_recv_message_opt(operationID *C.char, conversationID *C.char, opt C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationID), int(opt))
 }
 
 //export get_total_unread_msg_count
-func get_total_unread_msg_count(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_total_unread_msg_count(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetTotalUnreadMsgCount(baseCallback, C.GoString(operationID))
 }
 
@@ -652,278 +713,278 @@ func get_conversation_id_by_session_type(operationID *C.char, sourceID *C.char, 
 }
 
 //export send_message
-func send_message(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
-	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
+func send_message(operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+	sendMsgCallback := NewSendMessageCallback(operationID)
 	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
 		C.GoString(groupID), C.GoString(offlinePushInfo))
 }
 
 //export send_message_not_oss
-func send_message_not_oss(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
-	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
+func send_message_not_oss(operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+	sendMsgCallback := NewSendMessageCallback(operationID)
 	open_im_sdk.SendMessageNotOss(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
 		C.GoString(groupID), C.GoString(offlinePushInfo))
 }
 
 //export find_message_list
-func find_message_list(cCallback C.CB_S_I_S_S, operationID *C.char, findMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func find_message_list(operationID *C.char, findMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.FindMessageList(baseCallback, C.GoString(operationID), C.GoString(findMessageOptions))
 }
 
 //export get_advanced_history_message_list
-func get_advanced_history_message_list(cCallback C.CB_S_I_S_S, operationID, getMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_advanced_history_message_list(operationID, getMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
 }
 
 //export get_advanced_history_message_list_reverse
-func get_advanced_history_message_list_reverse(cCallback C.CB_S_I_S_S, operationID *C.char, getMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_advanced_history_message_list_reverse(operationID *C.char, getMessageOptions *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetAdvancedHistoryMessageListReverse(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
 }
 
 //export revoke_message
-func revoke_message(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func revoke_message(operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.RevokeMessage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
 }
 
 //export typing_status_update
-func typing_status_update(cCallback C.CB_S_I_S_S, operationID *C.char, recvID *C.char, msgTip *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func typing_status_update(operationID *C.char, recvID *C.char, msgTip *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.TypingStatusUpdate(baseCallback, C.GoString(operationID), C.GoString(recvID), C.GoString(msgTip))
 }
 
 //export mark_conversation_message_as_read
-func mark_conversation_message_as_read(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func mark_conversation_message_as_read(operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.MarkConversationMessageAsRead(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
 //export delete_message_from_local_storage
-func delete_message_from_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_message_from_local_storage(operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteMessageFromLocalStorage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
 }
 
 //export delete_message
-func delete_message(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_message(operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteMessage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
 }
 
 //export hide_all_conversations
-func hide_all_conversations(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func hide_all_conversations(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.HideAllConversations(baseCallback, C.GoString(operationID))
 }
 
 //export delete_all_msg_from_local_and_svr
-func delete_all_msg_from_local_and_svr(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_all_msg_from_local_and_svr(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteAllMsgFromLocalAndSvr(baseCallback, C.GoString(operationID))
 }
 
 //export delete_all_msg_from_local
-func delete_all_msg_from_local(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_all_msg_from_local(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteAllMsgFromLocal(baseCallback, C.GoString(operationID))
 }
 
 //export clear_conversation_and_delete_all_msg
-func clear_conversation_and_delete_all_msg(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func clear_conversation_and_delete_all_msg(operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.ClearConversationAndDeleteAllMsg(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
 //export delete_conversation_and_delete_all_msg
-func delete_conversation_and_delete_all_msg(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_conversation_and_delete_all_msg(operationID *C.char, conversationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteConversationAndDeleteAllMsg(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
 //export insert_single_message_to_local_storage
-func insert_single_message_to_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, message *C.char, recvID *C.char, sendID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func insert_single_message_to_local_storage(operationID *C.char, message *C.char, recvID *C.char, sendID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.InsertSingleMessageToLocalStorage(baseCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID), C.GoString(sendID))
 }
 
 //export insert_group_message_to_local_storage
-func insert_group_message_to_local_storage(cCallback C.CB_S_I_S_S, operationID *C.char, message *C.char, groupID *C.char, sendID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func insert_group_message_to_local_storage(operationID *C.char, message *C.char, groupID *C.char, sendID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.InsertGroupMessageToLocalStorage(baseCallback, C.GoString(operationID), C.GoString(message), C.GoString(groupID), C.GoString(sendID))
 }
 
 //export search_local_messages
-func search_local_messages(cCallback C.CB_S_I_S_S, operationID *C.char, searchParam *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func search_local_messages(operationID *C.char, searchParam *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SearchLocalMessages(baseCallback, C.GoString(operationID), C.GoString(searchParam))
 }
 
 //export set_message_local_ex
-func set_message_local_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char, localEx *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_message_local_ex(operationID *C.char, conversationID *C.char, clientMsgID *C.char, localEx *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetMessageLocalEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID), C.GoString(localEx))
 }
 
 // =====================================================user===============================================
 
 //export get_users_info
-func get_users_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_users_info(operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetUsersInfo(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 //export get_users_info_with_cache
-func get_users_info_with_cache(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char, groupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_users_info_with_cache(operationID *C.char, userIDs *C.char, groupID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetUsersInfoWithCache(baseCallback, C.GoString(operationID), C.GoString(userIDs), C.GoString(groupID))
 }
 
 //export get_users_info_from_srv
-func get_users_info_from_srv(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_users_info_from_srv(operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetUsersInfoFromSrv(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 //export set_self_info
-func set_self_info(cCallback C.CB_S_I_S_S, operationID *C.char, userInfo *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_self_info(operationID *C.char, userInfo *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetSelfInfo(baseCallback, C.GoString(operationID), C.GoString(userInfo))
 }
 
 //export set_global_recv_message_opt
-func set_global_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, opt C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_global_recv_message_opt(operationID *C.char, opt C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGlobalRecvMessageOpt(baseCallback, C.GoString(operationID), int(opt))
 }
 
 //export get_self_user_info
-func get_self_user_info(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_self_user_info(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetSelfUserInfo(baseCallback, C.GoString(operationID))
 }
 
 //export update_msg_sender_info
-func update_msg_sender_info(cCallback C.CB_S_I_S_S, operationID *C.char, nickname *C.char, faceURL *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func update_msg_sender_info(operationID *C.char, nickname *C.char, faceURL *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.UpdateMsgSenderInfo(baseCallback, C.GoString(operationID), C.GoString(nickname), C.GoString(faceURL))
 }
 
 //export subscribe_users_status
-func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func subscribe_users_status(operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 //export unsubscribe_users_status
-func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func unsubscribe_users_status(operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.UnsubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 //export get_subscribe_users_status
-func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_subscribe_users_status(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetSubscribeUsersStatus(baseCallback, C.GoString(operationID))
 }
 
 //export get_user_status
-func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_user_status(operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 // =====================================================friend===============================================
 //
 //export get_specified_friends_info
-func get_specified_friends_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_specified_friends_info(operationID *C.char, userIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, C.GoString(operationID), C.GoString(userIDList))
 }
 
 //export get_friend_list
-func get_friend_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_friend_list(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetFriendList(baseCallback, C.GoString(operationID))
 }
 
 //export get_friend_list_page
-func get_friend_list_page(cCallback C.CB_S_I_S_S, operationID *C.char, offset C.int, count C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_friend_list_page(operationID *C.char, offset C.int, count C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetFriendListPage(baseCallback, C.GoString(operationID), int32(offset), int32(count))
 }
 
 //export search_friends
-func search_friends(cCallback C.CB_S_I_S_S, operationID *C.char, searchParam *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func search_friends(operationID *C.char, searchParam *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SearchFriends(baseCallback, C.GoString(operationID), C.GoString(searchParam))
 }
 
 //export check_friend
-func check_friend(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func check_friend(operationID *C.char, userIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.CheckFriend(baseCallback, C.GoString(operationID), C.GoString(userIDList))
 }
 
 //export add_friend
-func add_friend(cCallback C.CB_S_I_S_S, operationID *C.char, userIDReqMsg *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func add_friend(operationID *C.char, userIDReqMsg *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.AddFriend(baseCallback, C.GoString(operationID), C.GoString(userIDReqMsg))
 }
 
 //export set_friend_remark
-func set_friend_remark(cCallback C.CB_S_I_S_S, operationID *C.char, userIDRemark *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_friend_remark(operationID *C.char, userIDRemark *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetFriendRemark(baseCallback, C.GoString(operationID), C.GoString(userIDRemark))
 }
 
 //export delete_friend
-func delete_friend(cCallback C.CB_S_I_S_S, operationID *C.char, friendUserID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func delete_friend(operationID *C.char, friendUserID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DeleteFriend(baseCallback, C.GoString(operationID), C.GoString(friendUserID))
 }
 
 //export get_friend_application_list_as_recipient
-func get_friend_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_friend_application_list_as_recipient(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, C.GoString(operationID))
 }
 
 //export get_friend_application_list_as_applicant
-func get_friend_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_friend_application_list_as_applicant(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, C.GoString(operationID))
 }
 
 //export accept_friend_application
-func accept_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, userIDHandleMsg *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func accept_friend_application(operationID *C.char, userIDHandleMsg *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.AcceptFriendApplication(baseCallback, C.GoString(operationID), C.GoString(userIDHandleMsg))
 }
 
 //export refuse_friend_application
-func refuse_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, userIDHandleMsg *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func refuse_friend_application(operationID *C.char, userIDHandleMsg *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.RefuseFriendApplication(baseCallback, C.GoString(operationID), C.GoString(userIDHandleMsg))
 }
 
 //export add_black
-func add_black(cCallback C.CB_S_I_S_S, operationID *C.char, blackUserID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func add_black(operationID *C.char, blackUserID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.AddBlack(baseCallback, C.GoString(operationID), C.GoString(blackUserID))
 }
 
 //export get_black_list
-func get_black_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_black_list(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetBlackList(baseCallback, C.GoString(operationID))
 }
 
 //export remove_black
-func remove_black(cCallback C.CB_S_I_S_S, operationID *C.char, removeUserID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func remove_black(operationID *C.char, removeUserID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.RemoveBlack(baseCallback, C.GoString(operationID), C.GoString(removeUserID))
 }
 
@@ -931,16 +992,16 @@ func remove_black(cCallback C.CB_S_I_S_S, operationID *C.char, removeUserID *C.c
 // CreateGroup creates a group
 //
 //export create_group
-func create_group(cCallback C.CB_S_I_S_S, operationID, cGroupReqInfo *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func create_group(operationID, cGroupReqInfo *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.CreateGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupReqInfo))
 }
 
 // JoinGroup joins a group
 //
 //export join_group
-func join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func join_group(operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReqMsg),
 		int32(cJoinSource))
 }
@@ -948,32 +1009,32 @@ func join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReqMsg *C.char, 
 // QuitGroup quits a group
 //
 //export quit_group
-func quit_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func quit_group(operationID, cGroupID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.QuitGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
 }
 
 // DismissGroup dismisses a group
 //
 //export dismiss_group
-func dismiss_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func dismiss_group(operationID, cGroupID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.DismissGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
 }
 
 // ChangeGroupMute changes the mute status of a group
 //
 //export change_group_mute
-func change_group_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cIsMute C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func change_group_mute(operationID, cGroupID *C.char, cIsMute C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.ChangeGroupMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), parseBool(int(cIsMute)))
 }
 
 // ChangeGroupMemberMute changes the mute status of a group member
 //
 //export change_group_member_mute
-func change_group_member_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID *C.char, cMutedSeconds C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func change_group_member_mute(operationID, cGroupID, cUserID *C.char, cMutedSeconds C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.ChangeGroupMemberMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID),
 		int(cMutedSeconds))
 }
@@ -981,8 +1042,8 @@ func change_group_member_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUs
 // SetGroupMemberRoleLevel sets the role level of a group member
 //
 //export set_group_member_role_level
-func set_group_member_role_level(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID *C.char, cRoleLevel C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_member_role_level(operationID, cGroupID, cUserID *C.char, cRoleLevel C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cUserID), int(cRoleLevel))
 }
@@ -990,72 +1051,72 @@ func set_group_member_role_level(cCallback C.CB_S_I_S_S, operationID, cGroupID, 
 // SetGroupMemberInfo sets the information of a group member
 //
 //export set_group_member_info
-func set_group_member_info(cCallback C.CB_S_I_S_S, operationID *C.char, cGroupMemberInfo *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_member_info(operationID *C.char, cGroupMemberInfo *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupMemberInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupMemberInfo))
 }
 
 // GetJoinedGroupList retrieves the list of joined groups
 //
 //export get_joined_group_list
-func get_joined_group_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_joined_group_list(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetJoinedGroupList(baseCallback, C.GoString(operationID))
 }
 
 // GetSpecifiedGroupsInfo retrieves the information of specified groups
 //
 //export get_specified_groups_info
-func get_specified_groups_info(cCallback C.CB_S_I_S_S, operationID, cGroupIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_specified_groups_info(operationID, cGroupIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetSpecifiedGroupsInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupIDList))
 }
 
 // SearchGroups searches for groups
 //
 //export search_groups
-func search_groups(cCallback C.CB_S_I_S_S, operationID, cSearchParam *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func search_groups(operationID, cSearchParam *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SearchGroups(baseCallback, C.GoString(operationID), C.GoString(cSearchParam))
 }
 
 // SetGroupInfo sets the information of a group
 //
 //export set_group_info
-func set_group_info(cCallback C.CB_S_I_S_S, operationID, cGroupInfo *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_info(operationID, cGroupInfo *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupInfo))
 }
 
 // SetGroupVerification sets the verification mode of a group
 //
 //export set_group_verification
-func set_group_verification(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cVerification C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_verification(operationID, cGroupID *C.char, cVerification C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupVerification(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cVerification))
 }
 
 // SetGroupLookMemberInfo sets the member information visibility of a group
 //
 //export set_group_look_member_info
-func set_group_look_member_info(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cRule C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_look_member_info(operationID, cGroupID *C.char, cRule C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupLookMemberInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
 }
 
 // SetGroupApplyMemberFriend sets the friend rule for group applicants
 //
 //export set_group_apply_member_friend
-func set_group_apply_member_friend(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cRule C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_apply_member_friend(operationID, cGroupID *C.char, cRule C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupApplyMemberFriend(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
 }
 
 // GetGroupMemberList retrieves the list of group members
 //
 //export get_group_member_list
-func get_group_member_list(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cFilter, cOffset, cCount C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_group_member_list(operationID, cGroupID *C.char, cFilter, cOffset, cCount C.int) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetGroupMemberList(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cFilter),
 		int32(cOffset), int32(cCount))
 }
@@ -1063,17 +1124,17 @@ func get_group_member_list(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char
 // GetGroupMemberOwnerAndAdmin retrieves the owner and admin members of a group
 //
 //export get_group_member_owner_and_admin
-func get_group_member_owner_and_admin(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_group_member_owner_and_admin(operationID, cGroupID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetGroupMemberOwnerAndAdmin(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
 }
 
 // GetGroupMemberListByJoinTimeFilter retrieves the list of group members filtered by join time
 //
 //export get_group_member_list_by_join_time_filter
-func get_group_member_list_by_join_time_filter(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cOffset,
+func get_group_member_list_by_join_time_filter(operationID, cGroupID *C.char, cOffset,
 	cCount C.int, cJoinTimeBegin, cJoinTimeEnd C.longlong, cFilterUserIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		int32(cOffset), int32(cCount), int64(cJoinTimeBegin), int64(cJoinTimeEnd), C.GoString(cFilterUserIDList))
 }
@@ -1081,8 +1142,8 @@ func get_group_member_list_by_join_time_filter(cCallback C.CB_S_I_S_S, operation
 // GetSpecifiedGroupMembersInfo retrieves the information of specified group members
 //
 //export get_specified_group_members_info
-func get_specified_group_members_info(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_specified_group_members_info(operationID, cGroupID, cUserIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cUserIDList))
 }
@@ -1090,8 +1151,8 @@ func get_specified_group_members_info(cCallback C.CB_S_I_S_S, operationID, cGrou
 // KickGroupMember kicks group members
 //
 //export kick_group_member
-func kick_group_member(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, cUserIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func kick_group_member(operationID, cGroupID, cReason, cUserIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.KickGroupMember(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
 		C.GoString(cUserIDList))
 }
@@ -1099,8 +1160,8 @@ func kick_group_member(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, c
 // TransferGroupOwner transfers the ownership of a group
 //
 //export transfer_group_owner
-func transfer_group_owner(cCallback C.CB_S_I_S_S, operationID, cGroupID, cNewOwnerUserID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func transfer_group_owner(operationID, cGroupID, cNewOwnerUserID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.TransferGroupOwner(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cNewOwnerUserID))
 }
@@ -1108,8 +1169,8 @@ func transfer_group_owner(cCallback C.CB_S_I_S_S, operationID, cGroupID, cNewOwn
 // InviteUserToGroup invites users to a group
 //
 //export invite_user_to_group
-func invite_user_to_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason, cUserIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func invite_user_to_group(operationID, cGroupID, cReason, cUserIDList *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.InviteUserToGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
 		C.GoString(cUserIDList))
 }
@@ -1117,24 +1178,24 @@ func invite_user_to_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason
 // GetGroupApplicationListAsRecipient retrieves the group application list as a recipient
 //
 //export get_group_application_list_as_recipient
-func get_group_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_group_application_list_as_recipient(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, C.GoString(operationID))
 }
 
 // GetGroupApplicationListAsApplicant retrieves the group application list as an applicant
 //
 //export get_group_application_list_as_applicant
-func get_group_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func get_group_application_list_as_applicant(operationID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, C.GoString(operationID))
 }
 
 // AcceptGroupApplication accepts a group application
 //
 //export accept_group_application
-func accept_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func accept_group_application(operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.AcceptGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cFromUserID), C.GoString(cHandleMsg))
 }
@@ -1142,8 +1203,8 @@ func accept_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 // RefuseGroupApplication refuses a group application
 //
 //export refuse_group_application
-func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func refuse_group_application(operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cFromUserID), C.GoString(cHandleMsg))
 }
@@ -1151,8 +1212,8 @@ func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 // SetGroupMemberNickname sets the nickname of a group member
 //
 //export set_group_member_nickname
-func set_group_member_nickname(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID, cGroupMemberNickname *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func set_group_member_nickname(operationID, cGroupID, cUserID, cGroupMemberNickname *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cUserID), C.GoString(cGroupMemberNickname))
 }
@@ -1160,16 +1221,16 @@ func set_group_member_nickname(cCallback C.CB_S_I_S_S, operationID, cGroupID, cU
 // SearchGroupMembers searches for group members
 //
 //export search_group_members
-func search_group_members(cCallback C.CB_S_I_S_S, operationID, cSearchParam *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func search_group_members(operationID, cSearchParam *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.SearchGroupMembers(baseCallback, C.GoString(operationID), C.GoString(cSearchParam))
 }
 
 // IsJoinGroup checks if the user has joined a group
 //
 //export is_join_group
-func is_join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
+func is_join_group(operationID, cGroupID *C.char) {
+	baseCallback := NewBaseCallback(operationID)
 	open_im_sdk.IsJoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
 }
 
