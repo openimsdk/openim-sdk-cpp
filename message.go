@@ -5,7 +5,7 @@ const (
 
 	Msg_Connecting
 	Msg_ConnectSuccess
-	Msg_ConectFailed
+	Msg_ConnectFailed
 	Msg_KickedOffline
 	Msg_UserTokenExpired
 
@@ -64,19 +64,59 @@ const (
 	Msg_Base_Success
 )
 
+const (
+	DataType_Empty = iota
+	DataType_Int
+	DataType_Bool
+	DataType_LocalConversation
+	DataType_LocalConversation_List
+	DataType_GetConversationRecvMessageOptResp_List
+	DataType_FindMessageListCallback
+	DataType_GetAdvancedHistoryMessageListParams
+	DataType_MsgStruct
+	DataType_SearchLocalMessagesCallback
+	DataType_FullUserInfo
+	DataType_FullUserInfo_List
+	DataType_FullUserInfoWithCache
+	DataType_FullUserInfoWithCache_List
+	DataType_LocalUser
+	DataType_LocalUser_List
+	DataType_OnlineStatus
+	DataType_OnlineStatus_List
+	DataType_SearchFriendItem
+	DataType_SearchFriendItem_List
+	DataType_UserIDResult
+	DataType_UserIDResult_List
+	DataType_LocalFriendRequest
+	DataType_LocalFriendRequest_List
+	DataType_LocalBlack
+	DataType_LocalBlack_List
+	DataType_GroupInfo
+	DataType_LocalGroup
+	DataType_LocalGroup_List
+	DataType_LocalGroupMember
+	DataType_LocalGroupMember_List
+	DataType_LocalAdminGroupRequest
+	DataType_LocalAdminGroupRequest_List
+	DataType_LocalGroupRequest
+	DataType_LocalGroupRequest_List
+)
+
 type Empty struct {
 }
 
 type Error struct {
+	OperationID string `json:"operationId"`
 	ErrCode     int32  `json:"errCode"`
 	ErrMsg      string `json:"errMsg"`
-	OperationID string `json:"operationId"`
 }
 
 type Success struct {
 	OperationID string `json:"operationId"`
+	DataType    int    `json:"dataType"`
 	Data        string `json:"data"`
 }
+
 type Progress struct {
 	OperationID string `json:"operationId"`
 	Progress    int    `json:"progress"`
