@@ -257,7 +257,7 @@ func (s SendMessageCallback) OnError(errCode int32, errMsg string) {
 }
 
 func (s SendMessageCallback) OnSuccess(data string) {
-	DispatorMsg(Msg_SendMessage_Success, Success{OperationID: s.operationID, Data: data})
+	DispatorMsg(Msg_SendMessage_Success, Success{OperationID: s.operationID, Data: data, DataType: DataType_MsgStruct})
 }
 
 func (s SendMessageCallback) OnProgress(progress int) {
@@ -273,10 +273,10 @@ func NewBaseCallback(operationID *C.char, dataType int) *BaseCallback {
 	return &BaseCallback{OperationID: C.GoString(operationID), DataType: dataType}
 }
 func (b BaseCallback) OnError(errCode int32, errMsg string) {
-	DispatorMsg(Msg_Base_Error, Error{OperationID: b.OperationID, ErrCode: errCode, ErrMsg: errMsg})
+	DispatorMsg(Msg_ErrorOrSuc, ErrorOrSuccess{OperationID: b.OperationID, ErrCode: errCode, ErrMsg: errMsg, DataType: DataType_Empty, Data: ""})
 }
 func (b BaseCallback) OnSuccess(data string) {
-	DispatorMsg(Msg_Base_Success, Success{OperationID: b.OperationID, DataType: b.DataType, Data: data})
+	DispatorMsg(Msg_ErrorOrSuc, ErrorOrSuccess{OperationID: b.OperationID, DataType: b.DataType, Data: data, ErrCode: -1, ErrMsg: ""})
 }
 
 type GroupListener struct {
