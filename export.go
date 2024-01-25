@@ -729,25 +729,25 @@ func send_message_not_oss(operationID, message, recvID, groupID, offlinePushInfo
 
 //export find_message_list
 func find_message_list(operationID *C.char, findMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(operationID, DataType_FindMessageListCallback)
+	baseCallback := NewBaseCallback(operationID, DataType_FindMessageList)
 	open_im_sdk.FindMessageList(baseCallback, C.GoString(operationID), C.GoString(findMessageOptions))
 }
 
 //export get_advanced_history_message_list
 func get_advanced_history_message_list(operationID, getMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageListParams)
+	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageList)
 	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
 }
 
 //export get_advanced_history_message_list_reverse
 func get_advanced_history_message_list_reverse(operationID *C.char, getMessageOptions *C.char) {
-	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageListParams)
+	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageList)
 	open_im_sdk.GetAdvancedHistoryMessageListReverse(baseCallback, C.GoString(operationID), C.GoString(getMessageOptions))
 }
 
 //export revoke_message
 func revoke_message(operationID *C.char, conversationID *C.char, clientMsgID *C.char) {
-	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageListParams)
+	baseCallback := NewBaseCallback(operationID, DataType_GetAdvancedHistoryMessageList)
 	open_im_sdk.RevokeMessage(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID))
 }
 

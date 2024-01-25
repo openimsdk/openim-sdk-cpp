@@ -70,8 +70,8 @@ const (
 	DataType_LocalConversation
 	DataType_LocalConversation_List
 	DataType_GetConversationRecvMessageOptResp_List
-	DataType_FindMessageListCallback
-	DataType_GetAdvancedHistoryMessageListParams
+	DataType_FindMessageList
+	DataType_GetAdvancedHistoryMessageList
 	DataType_MsgStruct
 	DataType_SearchLocalMessagesCallback
 	DataType_FullUserInfo
