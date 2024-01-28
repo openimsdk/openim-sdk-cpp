@@ -279,150 +279,6 @@ func (b BaseCallback) OnSuccess(data string) {
 	DispatorMsg(Msg_ErrorOrSuc, ErrorOrSuccess{OperationID: b.OperationID, DataType: b.DataType, Data: data, ErrCode: -1, ErrMsg: ""})
 }
 
-type GroupListener struct {
-}
-
-func (GroupListener) OnGroupApplicationAccepted(groupApplication string) {
-
-}
-func (GroupListener) OnGroupApplicationAdded(groupApplication string) {
-}
-func (GroupListener) OnGroupApplicationDeleted(groupApplication string) {
-}
-
-func (GroupListener) OnGroupApplicationRejected(groupApplication string) {
-}
-
-func (GroupListener) OnGroupDismissed(groupInfo string) {
-}
-
-func (GroupListener) OnGroupInfoChanged(groupInfo string) {
-}
-
-func (GroupListener) OnGroupMemberAdded(groupMemberInfo string) {
-}
-func (GroupListener) OnGroupMemberDeleted(groupMemberInfo string) {
-}
-func (GroupListener) OnGroupMemberInfoChanged(groupMemberInfo string) {
-}
-
-func (GroupListener) OnJoinedGroupAdded(groupInfo string) {
-}
-
-func (GroupListener) OnJoinedGroupDeleted(groupInfo string) {
-}
-
-type ConversationListener struct {
-}
-
-func (ConversationListener) OnConversationChanged(conversationList string) {
-}
-func (ConversationListener) OnNewConversation(conversationList string) {
-}
-func (ConversationListener) OnSyncServerFailed() {
-}
-func (ConversationListener) OnSyncServerFinish() {
-}
-func (ConversationListener) OnSyncServerStart() {
-}
-
-func (ConversationListener) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
-}
-
-type AdvancedMsgListener struct {
-}
-
-func (AdvancedMsgListener) OnMsgDeleted(message string) {
-}
-func (AdvancedMsgListener) OnNewRecvMessageRevoked(messageRevoked string) {
-}
-func (AdvancedMsgListener) OnRecvC2CReadReceipt(msgReceiptList string) {
-}
-func (AdvancedMsgListener) OnRecvGroupReadReceipt(groupMsgReceiptList string) {
-}
-func (AdvancedMsgListener) OnRecvMessageExtensionsAdded(msgID string, reactionExtensionList string) {
-}
-func (AdvancedMsgListener) OnRecvMessageExtensionsChanged(msgID string, reactionExtensionList string) {
-}
-func (AdvancedMsgListener) OnRecvMessageExtensionsDeleted(msgID string, reactionExtensionKeyList string) {
-}
-func (AdvancedMsgListener) OnRecvNewMessage(message string) {
-}
-func (AdvancedMsgListener) OnRecvOfflineNewMessage(message string) {
-}
-
-type BatchMsgListener struct {
-}
-
-func (BatchMsgListener) OnRecvNewMessages(messageList string) {
-}
-
-func (BatchMsgListener) OnRecvOfflineNewMessages(messageList string) {
-}
-
-type UserListener struct {
-}
-
-func (UserListener) OnSelfInfoUpdated(userInfo string) {
-}
-
-func (UserListener) OnUserStatusChanged(userOnlineStatus string) {
-
-}
-
-type FriendListener struct {
-}
-
-func (FriendListener) OnBlackAdded(blackInfo string) {
-
-}
-
-func (FriendListener) OnBlackDeleted(blackInfo string) {
-
-}
-
-func (FriendListener) OnFriendAdded(friendInfo string) {
-
-}
-
-func (FriendListener) OnFriendApplicationAccepted(friendApplication string) {
-
-}
-
-func (FriendListener) OnFriendApplicationAdded(friendApplication string) {
-
-}
-
-func (FriendListener) OnFriendApplicationDeleted(friendApplication string) {
-
-}
-
-func (FriendListener) OnFriendApplicationRejected(friendApplication string) {
-
-}
-
-func (FriendListener) OnFriendDeleted(friendInfo string) {
-
-}
-
-func (FriendListener) OnFriendInfoChanged(friendInfo string) {
-
-}
-
-type CustomBusinessListener struct {
-}
-
-func (CustomBusinessListener) OnRecvCustomBusinessMessage(businessMessage string) {
-
-}
-
-type MessageKvInfoListener struct {
-}
-
-func (MessageKvInfoListener) OnMessageKvInfoChanged(messageChangedList string) {
-
-}
-
 // =====================================================init_login===============================================
 
 //export  init_sdk
@@ -993,68 +849,68 @@ func remove_black(operationID *C.char, removeUserID *C.char) {
 // CreateGroup creates a group
 //
 //export create_group
-func create_group(operationID, cGroupReqInfo *C.char) {
+func create_group(operationID, groupReqInfo *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_GroupInfo)
-	open_im_sdk.CreateGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupReqInfo))
+	open_im_sdk.CreateGroup(baseCallback, C.GoString(operationID), C.GoString(groupReqInfo))
 }
 
 // JoinGroup joins a group
 //
 //export join_group
-func join_group(operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int) {
+func join_group(operationID, groupId, reqMsg *C.char, joinSource C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReqMsg),
-		int32(cJoinSource))
+	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(groupId), C.GoString(reqMsg),
+		int32(joinSource))
 }
 
 // QuitGroup quits a group
 //
 //export quit_group
-func quit_group(operationID, cGroupID *C.char) {
+func quit_group(operationID, groupId *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.QuitGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
+	open_im_sdk.QuitGroup(baseCallback, C.GoString(operationID), C.GoString(groupId))
 }
 
 // DismissGroup dismisses a group
 //
 //export dismiss_group
-func dismiss_group(operationID, cGroupID *C.char) {
+func dismiss_group(operationID, groupId *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.DismissGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
+	open_im_sdk.DismissGroup(baseCallback, C.GoString(operationID), C.GoString(groupId))
 }
 
 // ChangeGroupMute changes the mute status of a group
 //
 //export change_group_mute
-func change_group_mute(operationID, cGroupID *C.char, cIsMute C.int) {
+func change_group_mute(operationID, groupId *C.char, cIsMute C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.ChangeGroupMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), parseBool(int(cIsMute)))
+	open_im_sdk.ChangeGroupMute(baseCallback, C.GoString(operationID), C.GoString(groupId), parseBool(int(cIsMute)))
 }
 
 // ChangeGroupMemberMute changes the mute status of a group member
 //
 //export change_group_member_mute
-func change_group_member_mute(operationID, cGroupID, cUserID *C.char, cMutedSeconds C.int) {
+func change_group_member_mute(operationID, groupId, userId *C.char, mutedSeconds C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.ChangeGroupMemberMute(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cUserID),
-		int(cMutedSeconds))
+	open_im_sdk.ChangeGroupMemberMute(baseCallback, C.GoString(operationID), C.GoString(groupId), C.GoString(userId),
+		int(mutedSeconds))
 }
 
 // SetGroupMemberRoleLevel sets the role level of a group member
 //
 //export set_group_member_role_level
-func set_group_member_role_level(operationID, cGroupID, cUserID *C.char, cRoleLevel C.int) {
+func set_group_member_role_level(operationID, groupId, userId *C.char, roleLevel C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cUserID), int(cRoleLevel))
+	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(groupId),
+		C.GoString(userId), int(roleLevel))
 }
 
 // SetGroupMemberInfo sets the information of a group member
 //
 //export set_group_member_info
-func set_group_member_info(operationID *C.char, cGroupMemberInfo *C.char) {
+func set_group_member_info(operationID *C.char, groupMemberInfo *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupMemberInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupMemberInfo))
+	open_im_sdk.SetGroupMemberInfo(baseCallback, C.GoString(operationID), C.GoString(groupMemberInfo))
 }
 
 // GetJoinedGroupList retrieves the list of joined groups
@@ -1068,112 +924,112 @@ func get_joined_group_list(operationID *C.char) {
 // GetSpecifiedGroupsInfo retrieves the information of specified groups
 //
 //export get_specified_groups_info
-func get_specified_groups_info(operationID, cGroupIDList *C.char) {
+func get_specified_groups_info(operationID, groupIdList *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroup_List)
-	open_im_sdk.GetSpecifiedGroupsInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupIDList))
+	open_im_sdk.GetSpecifiedGroupsInfo(baseCallback, C.GoString(operationID), C.GoString(groupIdList))
 }
 
 // SearchGroups searches for groups
 //
 //export search_groups
-func search_groups(operationID, cSearchParam *C.char) {
+func search_groups(operationID, searchParam *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroup_List)
-	open_im_sdk.SearchGroups(baseCallback, C.GoString(operationID), C.GoString(cSearchParam))
+	open_im_sdk.SearchGroups(baseCallback, C.GoString(operationID), C.GoString(searchParam))
 }
 
 // SetGroupInfo sets the information of a group
 //
 //export set_group_info
-func set_group_info(operationID, cGroupInfo *C.char) {
+func set_group_info(operationID, groupInfo *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupInfo))
+	open_im_sdk.SetGroupInfo(baseCallback, C.GoString(operationID), C.GoString(groupInfo))
 }
 
 // SetGroupVerification sets the verification mode of a group
 //
 //export set_group_verification
-func set_group_verification(operationID, cGroupID *C.char, cVerification C.int) {
+func set_group_verification(operationID, groupId *C.char, verification C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupVerification(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cVerification))
+	open_im_sdk.SetGroupVerification(baseCallback, C.GoString(operationID), C.GoString(groupId), int32(verification))
 }
 
 // SetGroupLookMemberInfo sets the member information visibility of a group
 //
 //export set_group_look_member_info
-func set_group_look_member_info(operationID, cGroupID *C.char, cRule C.int) {
+func set_group_look_member_info(operationID, groupId *C.char, cRule C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupLookMemberInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
+	open_im_sdk.SetGroupLookMemberInfo(baseCallback, C.GoString(operationID), C.GoString(groupId), int32(cRule))
 }
 
 // SetGroupApplyMemberFriend sets the friend rule for group applicants
 //
 //export set_group_apply_member_friend
-func set_group_apply_member_friend(operationID, cGroupID *C.char, cRule C.int) {
+func set_group_apply_member_friend(operationID, groupId *C.char, cRule C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupApplyMemberFriend(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
+	open_im_sdk.SetGroupApplyMemberFriend(baseCallback, C.GoString(operationID), C.GoString(groupId), int32(cRule))
 }
 
 // GetGroupMemberList retrieves the list of group members
 //
 //export get_group_member_list
-func get_group_member_list(operationID, cGroupID *C.char, cFilter, cOffset, cCount C.int) {
+func get_group_member_list(operationID, groupId *C.char, cFilter, cOffset, cCount C.int) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroupMember_List)
-	open_im_sdk.GetGroupMemberList(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cFilter),
+	open_im_sdk.GetGroupMemberList(baseCallback, C.GoString(operationID), C.GoString(groupId), int32(cFilter),
 		int32(cOffset), int32(cCount))
 }
 
 // GetGroupMemberOwnerAndAdmin retrieves the owner and admin members of a group
 //
 //export get_group_member_owner_and_admin
-func get_group_member_owner_and_admin(operationID, cGroupID *C.char) {
+func get_group_member_owner_and_admin(operationID, groupId *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroupMember_List)
-	open_im_sdk.GetGroupMemberOwnerAndAdmin(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
+	open_im_sdk.GetGroupMemberOwnerAndAdmin(baseCallback, C.GoString(operationID), C.GoString(groupId))
 }
 
 // GetGroupMemberListByJoinTimeFilter retrieves the list of group members filtered by join time
 //
 //export get_group_member_list_by_join_time_filter
-func get_group_member_list_by_join_time_filter(operationID, cGroupID *C.char, cOffset,
+func get_group_member_list_by_join_time_filter(operationID, groupId *C.char, cOffset,
 	cCount C.int, cJoinTimeBegin, cJoinTimeEnd C.longlong, cFilterUserIDList *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroupMember_List)
-	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, C.GoString(operationID), C.GoString(groupId),
 		int32(cOffset), int32(cCount), int64(cJoinTimeBegin), int64(cJoinTimeEnd), C.GoString(cFilterUserIDList))
 }
 
 // GetSpecifiedGroupMembersInfo retrieves the information of specified group members
 //
 //export get_specified_group_members_info
-func get_specified_group_members_info(operationID, cGroupID, cUserIDList *C.char) {
+func get_specified_group_members_info(operationID, groupId, userIdList *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroupMember_List)
-	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cUserIDList))
+	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, C.GoString(operationID), C.GoString(groupId),
+		C.GoString(userIdList))
 }
 
 // KickGroupMember kicks group members
 //
 //export kick_group_member
-func kick_group_member(operationID, cGroupID, cReason, cUserIDList *C.char) {
+func kick_group_member(operationID, groupId, cReason, userIdList *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.KickGroupMember(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
-		C.GoString(cUserIDList))
+	open_im_sdk.KickGroupMember(baseCallback, C.GoString(operationID), C.GoString(groupId), C.GoString(cReason),
+		C.GoString(userIdList))
 }
 
 // TransferGroupOwner transfers the ownership of a group
 //
 //export transfer_group_owner
-func transfer_group_owner(operationID, cGroupID, cNewOwnerUserID *C.char) {
+func transfer_group_owner(operationID, groupId, cNewOwnerUserID *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.TransferGroupOwner(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
+	open_im_sdk.TransferGroupOwner(baseCallback, C.GoString(operationID), C.GoString(groupId),
 		C.GoString(cNewOwnerUserID))
 }
 
 // InviteUserToGroup invites users to a group
 //
 //export invite_user_to_group
-func invite_user_to_group(operationID, cGroupID, cReason, cUserIDList *C.char) {
+func invite_user_to_group(operationID, groupId, cReason, userIdList *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.InviteUserToGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReason),
-		C.GoString(cUserIDList))
+	open_im_sdk.InviteUserToGroup(baseCallback, C.GoString(operationID), C.GoString(groupId), C.GoString(cReason),
+		C.GoString(userIdList))
 }
 
 // GetGroupApplicationListAsRecipient retrieves the group application list as a recipient
@@ -1195,44 +1051,44 @@ func get_group_application_list_as_applicant(operationID *C.char) {
 // AcceptGroupApplication accepts a group application
 //
 //export accept_group_application
-func accept_group_application(operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
+func accept_group_application(operationID, groupId, fromUserId, handleMsg *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.AcceptGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cFromUserID), C.GoString(cHandleMsg))
+	open_im_sdk.AcceptGroupApplication(baseCallback, C.GoString(operationID), C.GoString(groupId),
+		C.GoString(fromUserId), C.GoString(handleMsg))
 }
 
 // RefuseGroupApplication refuses a group application
 //
 //export refuse_group_application
-func refuse_group_application(operationID, cGroupID, cFromUserID, cHandleMsg *C.char) {
+func refuse_group_application(operationID, groupId, fromUserId, handleMsg *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cFromUserID), C.GoString(cHandleMsg))
+	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(groupId),
+		C.GoString(fromUserId), C.GoString(handleMsg))
 }
 
 // SetGroupMemberNickname sets the nickname of a group member
 //
 //export set_group_member_nickname
-func set_group_member_nickname(operationID, cGroupID, cUserID, cGroupMemberNickname *C.char) {
+func set_group_member_nickname(operationID, groupId, userId, groupMemberNickname *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cUserID), C.GoString(cGroupMemberNickname))
+	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(groupId),
+		C.GoString(userId), C.GoString(groupMemberNickname))
 }
 
 // SearchGroupMembers searches for group members
 //
 //export search_group_members
-func search_group_members(operationID, cSearchParam *C.char) {
+func search_group_members(operationID, searchParam *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_LocalGroupMember_List)
-	open_im_sdk.SearchGroupMembers(baseCallback, C.GoString(operationID), C.GoString(cSearchParam))
+	open_im_sdk.SearchGroupMembers(baseCallback, C.GoString(operationID), C.GoString(searchParam))
 }
 
 // IsJoinGroup checks if the user has joined a group
 //
 //export is_join_group
-func is_join_group(operationID, cGroupID *C.char) {
+func is_join_group(operationID, groupId *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Bool)
-	open_im_sdk.IsJoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
+	open_im_sdk.IsJoinGroup(baseCallback, C.GoString(operationID), C.GoString(groupId))
 }
 
 func main() {
