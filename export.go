@@ -2,6 +2,7 @@ package main
 
 /*
 #include <stdio.h>
+#include <stdlib.h>
 typedef void (*MessageHandler)(int id ,char* data);
 extern MessageHandler messageHandler;
 extern void CallMessageHandler(MessageHandler msgHandler,int id,char* data);
@@ -13,6 +14,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"unsafe"
 
 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk"
 )
@@ -25,18 +27,23 @@ func SetMessageHandler(handler C.MessageHandler) {
 func DispatorMsg(msgId int, msg interface{}) {
 	t := reflect.TypeOf(msg)
 	kind := t.Kind()
+	var data = ""
 	if kind == reflect.Struct {
 		msgJson, err := json.Marshal(msg)
 		if err != nil {
-			C.CallMessageHandler(C.messageHandler, C.int(0), C.CString(fmt.Sprintf("Marshal Json Error :%s", err.Error())))
+			msgId = 0
+			data = fmt.Sprintf("Marshal Json Error :%s", err.Error())
 		} else {
-			C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString((string(msgJson))))
+			data = string(msgJson)
 		}
 	} else if kind == reflect.String {
-		C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString(msg.(string)))
+		data = msg.(string)
 	} else if kind == reflect.Int32 {
-		C.CallMessageHandler(C.messageHandler, C.int(msgId), C.CString(strconv.Itoa(msg.(int))))
+		data = strconv.Itoa(msg.(int))
 	}
+	var cdata = C.CString(data)
+	C.CallMessageHandler(C.messageHandler, C.int(msgId), cdata)
+	C.free(unsafe.Pointer(cdata))
 }
 
 func parseBool(b int) bool {
