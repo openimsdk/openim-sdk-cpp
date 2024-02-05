@@ -15,6 +15,7 @@ const (
 	Msg_NewConversation
 	Msg_ConversationChanged
 	Msg_TotalUnreadMessageCountChanged
+	Msg_ConversationUserInputStatusChanged
 
 	Msg_Advanced_RecvNewMessage
 	Msg_Advanced_RecvC2CReadReceipt
@@ -25,6 +26,7 @@ const (
 	Msg_Advanced_RecvMessageExtensionsAdded
 	Msg_Advanced_RecvOfflineNewMessage
 	Msg_Advanced_MsgDeleted
+	Msg_Advanced_RecvOnlineOnlyMessage
 
 	Msg_Batch_RecvNewMessages
 	Msg_Batch_RecvOfflineNewMessages

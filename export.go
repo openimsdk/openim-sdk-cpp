@@ -101,6 +101,9 @@ func (c ConversationCallback) OnConversationChanged(conversationList string) {
 func (c ConversationCallback) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
 	DispatorMsg(Msg_TotalUnreadMessageCountChanged, totalUnreadCount)
 }
+func (c ConversationCallback) OnConversationUserInputStatusChanged(change string) {
+	DispatorMsg(Msg_ConversationUserInputStatusChanged, change)
+}
 
 type AdvancedMsgCallback struct {
 }
@@ -131,6 +134,9 @@ func (a AdvancedMsgCallback) OnRecvOfflineNewMessage(message string) {
 }
 func (a AdvancedMsgCallback) OnMsgDeleted(message string) {
 	DispatorMsg(Msg_Advanced_MsgDeleted, message)
+}
+func (*AdvancedMsgCallback) OnRecvOnlineOnlyMessage(message string) {
+	DispatorMsg(Msg_Advanced_RecvOnlineOnlyMessage, message)
 }
 
 func NewAdvancedMsgCallback() *AdvancedMsgCallback {
@@ -835,9 +841,9 @@ func refuse_friend_application(operationID *C.char, userIDHandleMsg *C.char) {
 }
 
 //export add_black
-func add_black(operationID *C.char, blackUserID *C.char) {
+func add_black(operationID *C.char, blackUserID *C.char, ex *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
-	open_im_sdk.AddBlack(baseCallback, C.GoString(operationID), C.GoString(blackUserID))
+	open_im_sdk.AddBlack(baseCallback, C.GoString(operationID), C.GoString(blackUserID), C.GoString(ex))
 }
 
 //export get_black_list
@@ -864,10 +870,10 @@ func create_group(operationID, groupReqInfo *C.char) {
 // JoinGroup joins a group
 //
 //export join_group
-func join_group(operationID, groupId, reqMsg *C.char, joinSource C.int) {
+func join_group(operationID, groupId, reqMsg *C.char, joinSource C.int, ex *C.char) {
 	baseCallback := NewBaseCallback(operationID, DataType_Empty)
 	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(groupId), C.GoString(reqMsg),
-		int32(joinSource))
+		int32(joinSource), C.GoString(ex))
 }
 
 // QuitGroup quits a group
