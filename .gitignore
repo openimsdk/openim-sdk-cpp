@@ -33,3 +33,5 @@
 /vendor
 /openimsdk.h
 /openimsdk.dll
+/build
+/.vscode
