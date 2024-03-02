@@ -39,7 +39,7 @@ func DispatorMsg(msgId int, msg interface{}) {
 	} else if kind == reflect.String {
 		data = msg.(string)
 	} else if kind == reflect.Int32 {
-		data = strconv.Itoa(msg.(int))
+		data = strconv.Itoa(int(msg.(int32)))
 	}
 	var cdata = C.CString(data)
 	C.CallMessageHandler(C.messageHandler, C.int(msgId), cdata)
