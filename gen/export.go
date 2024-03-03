@@ -24,6 +24,11 @@ func SetMessageHandler(handler C.MessageHandler) {
 	C.messageHandler = handler
 }
 
+//export free_memory
+func free_memory(p *C.char) {
+	C.free(unsafe.Pointer(p))
+}
+
 func DispatorMsg(msgId int, msg interface{}) {
 	t := reflect.TypeOf(msg)
 	kind := t.Kind()
