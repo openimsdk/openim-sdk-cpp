@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
         printf("return :%s\n",loginUserID);
     char operationID1[] = "12345,create";
-    char *message = create_text_message(operationID1, "哈哈");
+    char *message = create_text_message(operationID1, "hello");
     printf("return :%s\n",message);
     char operationID2[] = "12345,get_all_conversation_list";
     get_all_conversation_list(c_base_callback, operationID2);
