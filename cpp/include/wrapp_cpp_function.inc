@@ -1,3 +1,13 @@
+/*
+Using C++ template functions and recursion to initialize a function pointer pool,
+combined with lambda expressions, this implementation manages function pointers,
+achieving acquisition and release of pointers.All wrappers are used to convert
+and map C++ functions to C functions, and with the use of indexed locking,
+a thread-safe function pointer pool is implemented.For example, the wrapping
+functions essentially map C++ functions to C functions. When a C function callback is triggered,
+the function pointer pool, initialized through template recursion, locates the corresponding C++ function and invokes it.
+*/
+
 #define MAX_NUM_OF_CB_S 10
 #define MAX_NUM_OF_CB_I_S 10
 #define MAX_NUM_OF_CB_S_I_S_S 10
