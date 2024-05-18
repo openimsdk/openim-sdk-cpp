@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "openimsdk.h"
+#include "../include/libopenimsdk.h"
 
 typedef struct
 {
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     set_advanced_msg_listener(c_message_callback);
     login(c_base_callback, operationID, uid, token);
     sleep(10);
-    //    char text[] = "哈哈";
+    //    char text[] = "hello";
     char* loginUserID=get_login_user();
 
         printf("return :%s\n",loginUserID);

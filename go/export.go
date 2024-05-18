@@ -97,8 +97,16 @@ func (c ConversationCallback) OnTotalUnreadMessageCountChanged(totalUnreadCount 
 	C.Call_CB_I_S(c.cCallback, TOTAL_UNREAD_MESSAGE_COUNT_CHANGED, C.CString(Int32ToString(totalUnreadCount)))
 }
 
+func (c ConversationCallback) OnConversationUserInputStatusChanged(change string) {
+	C.Call_CB_I_S(c.cCallback, CONVERSATION_USER_INPUT_STATUS_CHANGED, C.CString(change))
+}
+
 type AdvancedMsgCallback struct {
 	cCallback C.CB_I_S
+}
+
+func NewAdvancedMsgCallback(cCallback C.CB_I_S) *AdvancedMsgCallback {
+	return &AdvancedMsgCallback{cCallback: cCallback}
 }
 
 func (a AdvancedMsgCallback) OnRecvNewMessage(message string) {
@@ -146,12 +154,16 @@ func (a AdvancedMsgCallback) OnMsgDeleted(message string) {
 	C.Call_CB_I_S(a.cCallback, MSG_DELETED, C.CString(message))
 }
 
-func NewAdvancedMsgCallback(cCallback C.CB_I_S) *AdvancedMsgCallback {
-	return &AdvancedMsgCallback{cCallback: cCallback}
+func (a AdvancedMsgCallback) OnRecvOnlineOnlyMessage(message string) {
+	C.Call_CB_I_S(a.cCallback, RECV_ONLINE_ONLY_MESSAGE, C.CString(message))
 }
 
 type BatchMessageCallback struct {
 	cCallback C.CB_I_S
+}
+
+func NewBatchMessageCallback(cCallback C.CB_I_S) *BatchMessageCallback {
+	return &BatchMessageCallback{cCallback: cCallback}
 }
 
 func (b BatchMessageCallback) OnRecvNewMessages(messageList string) {
@@ -162,12 +174,12 @@ func (b BatchMessageCallback) OnRecvOfflineNewMessages(messageList string) {
 	C.Call_CB_I_S(b.cCallback, RECV_OFFLINE_NEW_MESSAGES, C.CString(messageList))
 }
 
-func NewBatchMessageCallback(cCallback C.CB_I_S) *BatchMessageCallback {
-	return &BatchMessageCallback{cCallback: cCallback}
-}
-
 type FriendCallback struct {
 	cCallback C.CB_I_S
+}
+
+func NewFriendCallback(cCallback C.CB_I_S) *FriendCallback {
+	return &FriendCallback{cCallback: cCallback}
 }
 
 func (f FriendCallback) OnFriendApplicationAdded(friendApplication string) {
@@ -204,10 +216,6 @@ func (f FriendCallback) OnBlackAdded(blackInfo string) {
 
 func (f FriendCallback) OnBlackDeleted(blackInfo string) {
 	C.Call_CB_I_S(f.cCallback, BLACK_DELETED, C.CString(blackInfo))
-}
-
-func NewFriendCallback(cCallback C.CB_I_S) *FriendCallback {
-	return &FriendCallback{cCallback: cCallback}
 }
 
 type GroupCallback struct {
@@ -266,16 +274,20 @@ type CustomBusinessCallback struct {
 	cCallback C.CB_I_S
 }
 
-func (c CustomBusinessCallback) OnRecvCustomBusinessMessage(businessMessage string) {
-	C.Call_CB_I_S(c.cCallback, RECV_CUSTOM_BUSINESS_MESSAGE, C.CString(businessMessage))
-}
-
 func NewCustomBusinessCallback(cCallback C.CB_I_S) *CustomBusinessCallback {
 	return &CustomBusinessCallback{cCallback: cCallback}
 }
 
+func (c CustomBusinessCallback) OnRecvCustomBusinessMessage(businessMessage string) {
+	C.Call_CB_I_S(c.cCallback, RECV_CUSTOM_BUSINESS_MESSAGE, C.CString(businessMessage))
+}
+
 type UserCallback struct {
 	cCallback C.CB_I_S
+}
+
+func NewUserCallback(cCallback C.CB_I_S) *UserCallback {
+	return &UserCallback{cCallback: cCallback}
 }
 
 func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
@@ -284,10 +296,6 @@ func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
 
 func (u UserCallback) OnUserStatusChanged(statusMap string) {
 	C.Call_CB_I_S(u.cCallback, USER_STATUS_CHANGED, C.CString(statusMap))
-}
-
-func NewUserCallback(cCallback C.CB_I_S) *UserCallback {
-	return &UserCallback{cCallback: cCallback}
 }
 
 type SendMessageCallback struct {
@@ -652,17 +660,17 @@ func get_conversation_id_by_session_type(operationID *C.char, sourceID *C.char, 
 }
 
 //export send_message
-func send_message(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+func send_message(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char, isOnlineOnly C.int) {
 	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
 	open_im_sdk.SendMessage(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
-		C.GoString(groupID), C.GoString(offlinePushInfo))
+		C.GoString(groupID), C.GoString(offlinePushInfo), parseBool(int(isOnlineOnly)))
 }
 
 //export send_message_not_oss
-func send_message_not_oss(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char) {
+func send_message_not_oss(cCallback C.CB_S_I_S_S_I, operationID, message, recvID, groupID, offlinePushInfo *C.char, isOnlineOnly C.int) {
 	sendMsgCallback := NewSendMessageCallback(cCallback, operationID)
 	open_im_sdk.SendMessageNotOss(sendMsgCallback, C.GoString(operationID), C.GoString(message), C.GoString(recvID),
-		C.GoString(groupID), C.GoString(offlinePushInfo))
+		C.GoString(groupID), C.GoString(offlinePushInfo), parseBool(int(isOnlineOnly)))
 }
 
 //export find_message_list
@@ -910,9 +918,9 @@ func refuse_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, user
 }
 
 //export add_black
-func add_black(cCallback C.CB_S_I_S_S, operationID *C.char, blackUserID *C.char) {
+func add_black(cCallback C.CB_S_I_S_S, operationID *C.char, blackUserID *C.char, ex *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.AddBlack(baseCallback, C.GoString(operationID), C.GoString(blackUserID))
+	open_im_sdk.AddBlack(baseCallback, C.GoString(operationID), C.GoString(blackUserID), C.GoString(ex))
 }
 
 //export get_black_list
@@ -939,10 +947,10 @@ func create_group(cCallback C.CB_S_I_S_S, operationID, cGroupReqInfo *C.char) {
 // JoinGroup joins a group
 //
 //export join_group
-func join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int) {
+func join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReqMsg *C.char, cJoinSource C.int, ex *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.JoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(cReqMsg),
-		int32(cJoinSource))
+		int32(cJoinSource), C.GoString(ex))
 }
 
 // QuitGroup quits a group
