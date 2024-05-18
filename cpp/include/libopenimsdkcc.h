@@ -145,7 +145,8 @@ public:
   void GetAdvancedHistoryMessageList(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& getAdvancedHistoryCallback , const std::string& operationID, const std::string& getMessageOptions);
 
   // send message
-  void SendMessage(const std::function<void(const std::string&, int, const std::string&, const std::string&, int)>& callback, const std::string& operationID, const std::string& message, const std::string& recvID, const std::string& groupID, const std::string& offlinePushInfo);
+  void SendMessage(const std::function<void(const std::string&, int, const std::string&, const std::string&, int)>& callback, const std::string& operationID,
+  const std::string& message, const std::string& recvID, const std::string& groupID, const std::string& offlinePushInfo,bool isOnlineOnly);
 
   // // =====================================================user===============================================
   // //
@@ -226,6 +227,10 @@ public:
   // remove black
   void RemoveBlack(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& removeUserID);
 
+  // set friends ex
+  void SetFriendsEx(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback,
+  const std::string& operationID, const std::string& friendIDs,const std::string& ex);
+
 
   // // =====================================================group===============================================
   // // 
@@ -234,7 +239,7 @@ public:
   void CreateGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& groupReqInfo);
 
   // join group
-  void JoinGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& groupID, const std::string& reqMsg, int joinSource);
+  void JoinGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& groupID, const std::string& reqMsg, int joinSource,const std::string& ex);
 
   // quit group
   void QuitGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& groupID);

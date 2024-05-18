@@ -407,14 +407,16 @@ void OpenIMManager::GetAdvancedHistoryMessageList(const std::function<void(const
 }
 
 // send message
-void SendMessage(const std::function<void(const std::string&, int, const std::string&, const std::string&,int)>& sendMessageCallback, const std::string& operationID, const std::string& message,const std::string& recvID,const std::string& groupID,const std::string& offlinePushInfo)
+void SendMessage(const std::function<void(const std::string&, int, const std::string&, const std::string&,int)>& sendMessageCallback,
+const std::string& operationID, const std::string& message,const std::string& recvID,const std::string& groupID,const std::string& offlinePushInfo,bool isOnlineOnly)
 {
   char* operationID_cs=const_cast<char*>(operationID.c_str());
   char* message_cs=const_cast<char*>(message.c_str());
   char* recvID_cs=const_cast<char*>(recvID.c_str());
   char* groupID_cs=const_cast<char*>(groupID.c_str());
   char* offlinePushInfo_cs=const_cast<char*>(offlinePushInfo.c_str());
-  send_message(_wrapper_callonce_cpp_function(sendMessageCallback),operationID_cs,message_cs,recvID_cs,groupID_cs,offlinePushInfo_cs);
+  int isOnlineOnly_c = isOnlineOnly ? 1 : 0;
+  send_message(_wrapper_callonce_cpp_function(sendMessageCallback),operationID_cs,message_cs,recvID_cs,groupID_cs,offlinePushInfo_cs,isOnlineOnly_c);
 }
 
 // // ===================================================== user ===============================================
@@ -588,11 +590,13 @@ void OpenIMManager::RefuseFriendApplication(const std::function<void(const std::
 }
 
 // add black
-void OpenIMManager::AddBlack(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback,const std::string& operationID, const std::string& userIDs)
+void OpenIMManager::AddBlack(const std::function<void(const std::string&, int, const std::string&,
+ const std::string&)>& callback,const std::string& operationID, const std::string& userIDs,const std::string& ex)
 {
   char* operationID_cs=const_cast<char*>(operationID.c_str());
   char* userIDs_cs=const_cast<char*>(userIDs.c_str());
-  add_black(_wrapper_callonce_cpp_function(callback),operationID_cs,userIDs_cs);
+  char* ex_cs = const_cast<char*>(ex.c_str());
+  add_black(_wrapper_callonce_cpp_function(callback),operationID_cs,userIDs_cs,ex_cs);
 }
 
 // get black list
@@ -610,6 +614,15 @@ void OpenIMManager::RemoveBlack(const std::function<void(const std::string&, int
   remove_black(_wrapper_callonce_cpp_function(callback),operationID_cs,userIDs_cs);
 }
 
+// set friends ex
+void OpenIMManager::SetFriendsEx(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID,const std::string& friendIDs, const std::string& ex)
+{
+  char* operationID_cs=const_cast<char*>(operationID.c_str());
+  char* friendIDs_cs=const_cast<char*>(friendIDs.c_str());
+  char* ex_cs=const_cast<char*>(ex.c_str());
+  set_friends_ex(_wrapper_callonce_cpp_function(callback),operationID_cs,friendIDs_cs,ex_cs);
+}
+
 // // ===================================================== group ===============================================
 // // 
 
@@ -622,12 +635,14 @@ void OpenIMManager::CreateGroup(const std::function<void(const std::string&, int
 }
 
 // join group
-void OpenIMManager::JoinGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback, const std::string& operationID, const std::string& groupID, const std::string& reqMsg, int joinSource)
+void OpenIMManager::JoinGroup(const std::function<void(const std::string&, int, const std::string&, const std::string&)>& callback,
+ const std::string& operationID, const std::string& groupID, const std::string& reqMsg, int joinSource,const std::string& ex)
 {
   char* operationID_cs=const_cast<char*>(operationID.c_str());
   char* groupID_cs=const_cast<char*>(groupID.c_str());
   char* reqMsg_cs=const_cast<char*>(reqMsg.c_str());
-  join_group(_wrapper_callonce_cpp_function(callback),operationID_cs,groupID_cs,reqMsg_cs,joinSource);
+  char* ex_cs = const_cast<char*>(ex.c_str());
+  join_group(_wrapper_callonce_cpp_function(callback),operationID_cs,groupID_cs,reqMsg_cs,joinSource,ex_cs);
 }
 
 // quit group
