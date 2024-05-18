@@ -594,6 +594,12 @@ func set_conversation_is_msg_destruct(cCallback C.CB_S_I_S_S, operationID *C.cha
 	open_im_sdk.SetConversationIsMsgDestruct(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isMsgDestruct)))
 }
 
+//export set_conversation_ex
+func set_conversation_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, ex *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetConversationEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(ex))
+}
+
 //export hide_conversation
 func hide_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)

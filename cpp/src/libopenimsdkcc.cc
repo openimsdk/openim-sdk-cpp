@@ -1,6 +1,6 @@
-#include "openimsdkcc.h"
+#include "../include/libopenimsdk.h"
 
-#include "wrapp_cpp_function.inc"
+#include "../include/wrapp_cpp_function.inc"
 
 namespace openim {
 

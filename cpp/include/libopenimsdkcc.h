@@ -1,6 +1,6 @@
 #pragma once
 
-#include "openimsdk.h"
+#include "libopenimsdk.h"
 #include <functional>
 #include <string>
 #include <memory>
