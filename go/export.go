@@ -944,7 +944,7 @@ func remove_black(cCallback C.CB_S_I_S_S, operationID *C.char, removeUserID *C.c
 //export set_friends_ex
 func set_friends_ex(cCallback C.CB_S_I_S_S, operationID, friendIDs, ex *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetFriendsEx(baseCallback, C.GoString(operationID), C.GoString(friendIDs), ex)
+	open_im_sdk.SetFriendsEx(baseCallback, C.GoString(operationID), C.GoString(friendIDs), C.GoString(ex))
 }
 
 // =====================================================group===============================================

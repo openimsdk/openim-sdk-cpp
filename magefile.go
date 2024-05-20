@@ -65,6 +65,8 @@ func BuildIOS() error {
 	cmd := exec.Command("go", "build", "-buildmode=c-shared", "-o", outPath+"/"+soName+".dylib", ".")
 	cmd.Dir = goSrc
 	cmd.Env = os.Environ()
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Failed to build for iOS: %v\n", err)
