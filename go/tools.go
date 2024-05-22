@@ -27,6 +27,7 @@ func FreeCString(strList ...*C.char) {
 		C.free(unsafe.Pointer(str))
 	}
 }
-func Int32ToString(intValue int32) string {
-	return strconv.Itoa(int(intValue))
+
+func IntToString[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64](intValue T) string {
+	return strconv.FormatInt(int64(intValue), 10)
 }
