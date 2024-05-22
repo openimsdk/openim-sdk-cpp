@@ -94,7 +94,7 @@ func (c ConversationCallback) OnConversationChanged(conversationList string) {
 }
 
 func (c ConversationCallback) OnTotalUnreadMessageCountChanged(totalUnreadCount int32) {
-	C.Call_CB_I_S(c.cCallback, TOTAL_UNREAD_MESSAGE_COUNT_CHANGED, C.CString(Int32ToString(totalUnreadCount)))
+	C.Call_CB_I_S(c.cCallback, TOTAL_UNREAD_MESSAGE_COUNT_CHANGED, C.CString(IntToString(totalUnreadCount)))
 }
 
 func (c ConversationCallback) OnConversationUserInputStatusChanged(change string) {
@@ -126,21 +126,21 @@ func (a AdvancedMsgCallback) OnNewRecvMessageRevoked(messageRevoked string) {
 }
 
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsChanged(msgID string, reactionExtensionList string) {
-	m := make(map[string]string)
+	m := make(map[string]any)
 	m["msgID"] = msgID
 	m["reactionExtensionList"] = reactionExtensionList
 	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_CHANGED, C.CString(StructToJsonString(m)))
 }
 
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsDeleted(msgID string, reactionExtensionKeyList string) {
-	m := make(map[string]string)
+	m := make(map[string]any)
 	m["msgID"] = msgID
 	m["reactionExtensionKeyList"] = reactionExtensionKeyList
 	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_DELETED, C.CString(StructToJsonString(m)))
 }
 
 func (a AdvancedMsgCallback) OnRecvMessageExtensionsAdded(msgID string, reactionExtensionList string) {
-	m := make(map[string]string)
+	m := make(map[string]any)
 	m["msgID"] = msgID
 	m["reactionExtensionList"] = reactionExtensionList
 	C.Call_CB_I_S(a.cCallback, RECV_MESSAGE_EXTENSIONS_ADDED, C.CString(StructToJsonString(m)))
@@ -334,6 +334,68 @@ func (b BaseCallback) OnError(errCode int32, errMsg string) {
 
 func (b BaseCallback) OnSuccess(data string) {
 	C.Call_CB_S_I_S_S(b.cCallback, C.CString(b.operationID), NO_ERR, NO_ERR_MSG, C.CString(data))
+}
+
+type UploadFileCallback struct {
+	cCallback C.CB_I_S
+}
+
+func NewUploadFileCallback(cCallback C.CB_I_S) *UploadFileCallback {
+	return &UploadFileCallback{cCallback: cCallback}
+}
+
+func (u UploadFileCallback) Open(size int64) {
+	C.Call_CB_I_S(u.cCallback, OPEN, C.CString(IntToString(size)))
+}
+
+func (u UploadFileCallback) PartSize(partSize int64, num int) {
+	m := make(map[string]any)
+	m["partSize"] = partSize
+	m["num"] = num
+	C.Call_CB_I_S(u.cCallback, PART_SIZE, C.CString(StructToJsonString(m)))
+}
+
+func (u UploadFileCallback) HashPartProgress(index int, size int64, partHash string) {
+	m := make(map[string]any)
+	m["index"] = index
+	m["size"] = size
+	m["partHash"] = partHash
+	C.Call_CB_I_S(u.cCallback, HASH_PART_PROGRESS, C.CString(StructToJsonString(m)))
+}
+
+func (u UploadFileCallback) HashPartComplete(partsHash string, fileHash string) {
+	m := make(map[string]any)
+	m["partsHash"] = partsHash
+	m["fileHash"] = fileHash
+	C.Call_CB_I_S(u.cCallback, HASH_PART_COMPLETE, C.CString(StructToJsonString(m)))
+}
+
+func (u UploadFileCallback) UploadID(uploadID string) {
+	C.Call_CB_I_S(u.cCallback, UPLOAD_ID, C.CString(uploadID))
+}
+
+func (u UploadFileCallback) UploadPartComplete(index int, partSize int64, partHash string) {
+	m := make(map[string]any)
+	m["index"] = index
+	m["partSize"] = partSize
+	m["partHash"] = partHash
+	C.Call_CB_I_S(u.cCallback, UPLOAD_PART_COMPLETE, C.CString(StructToJsonString(m)))
+}
+
+func (u UploadFileCallback) UploadComplete(fileSize int64, streamSize int64, storageSize int64) {
+	m := make(map[string]any)
+	m["fileSize"] = fileSize
+	m["streamSize"] = streamSize
+	m["storageSize"] = storageSize
+	C.Call_CB_I_S(u.cCallback, UPLOAD_COMPLETE, C.CString(StructToJsonString(m)))
+}
+
+func (u UploadFileCallback) Complete(size int64, url string, typ int) {
+	m := make(map[string]any)
+	m["size"] = size
+	m["url"] = url
+	m["typ"] = typ
+	C.Call_CB_I_S(u.cCallback, COMPLETE, C.CString(StructToJsonString(m)))
 }
 
 // =====================================================global_callback===============================================
@@ -847,6 +909,16 @@ func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
 func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+// =====================================================file===============================================
+//
+
+//export upload_file
+func upload_file(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char, uploadCallback C.CB_I_S) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	uploadFileCallback := NewUploadFileCallback(uploadCallback)
+	open_im_sdk.UploadFile(baseCallback, C.GoString(operationID), C.GoString(req), uploadFileCallback)
 }
 
 // =====================================================friend===============================================
