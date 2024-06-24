@@ -65,6 +65,10 @@ func (c ConnCallback) OnUserTokenExpired() {
 	C.Call_CB_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_DATA)
 }
 
+func (c ConnCallback) OnUserTokenInvalid(errMsg string) {
+	C.Call_CB_I_S(c.cCallback, USER_TOKEN_INVALID, C.CString(errMsg))
+}
+
 type ConversationCallback struct {
 	cCallback C.CB_I_S
 }
@@ -297,6 +301,10 @@ func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
 func (u UserCallback) OnUserStatusChanged(statusMap string) {
 	C.Call_CB_I_S(u.cCallback, USER_STATUS_CHANGED, C.CString(statusMap))
 }
+
+func (u UserCallback) OnUserCommandAdd(userCommand string)    {}
+func (u UserCallback) OnUserCommandDelete(userCommand string) {}
+func (u UserCallback) OnUserCommandUpdate(userCommand string) {}
 
 type SendMessageCallback struct {
 	cCallback   C.CB_S_I_S_S_I
