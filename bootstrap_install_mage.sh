@@ -19,5 +19,3 @@ if ! command -v mage &> /dev/null; then
 fi
 
 echo "Mage installed successfully."
-
-go mod download

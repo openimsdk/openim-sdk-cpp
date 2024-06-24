@@ -1,0 +1,61 @@
+name: Build electron assets
+
+on: 
+    workflow_dispatch:
+
+jobs:
+    build:
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          include:
+            - os: ubuntu-latest
+              arch: amd64
+              build: buildLinux
+            - os: ubuntu-latest
+              arch: arm64
+              build: buildLinux
+            - os: macos-latest
+              arch: amd64
+              build: buildIOS
+            - os: macos-latest
+              arch: arm64
+              build: buildIOS
+            - os: windows-latest
+              arch: amd64
+              build: buildWindows
+            - os: windows-latest
+              arch: 386
+              build: buildWindows
+  
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+  
+        - name: Setup Go environment
+          uses: actions/setup-go@v5
+          with:
+            go-version: '1.22'
+  
+        - name: Check Go version
+          run: go version
+  
+        - name: Setup and build on Windows ${{ matrix.arch }}
+          if: runner.os == 'Windows'
+          run: |
+            echo "GOARCH=${{ matrix.arch }}" >> $GITHUB_ENV
+            ./bootstrap_install_mage.bat
+            mage ${{ matrix.build }}
+
+        - name: Setup and build on ${{ matrix.os }} ${{ matrix.arch }}
+          if: runner.os != 'Windows'
+          run: |
+            sudo bash ./bootstrap_install_mage.sh
+            sudo mage ${{ matrix.build }}
+  
+        - name: Upload Artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ matrix.os }}-${{ matrix.arch }}-assets
+            path: shared/${{ (matrix.os == 'macos-latest' && 'ios' || (matrix.os == 'windows-latest' && 'windows' || 'linux')) }}/
+  
