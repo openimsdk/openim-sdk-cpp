@@ -1103,6 +1103,14 @@ func get_joined_group_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	open_im_sdk.GetJoinedGroupList(baseCallback, C.GoString(operationID))
 }
 
+// GetJoinedGroupListPage retrieves the list of joined groups with pagination
+//
+//export get_joined_group_list_page
+func get_joined_group_list_page(cCallback C.CB_S_I_S_S, operationID *C.char, offset, count C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetJoinedGroupListPage(baseCallback, C.GoString(operationID), int32(offset), int32(count))
+}
+
 // GetSpecifiedGroupsInfo retrieves the information of specified groups
 //
 //export get_specified_groups_info
