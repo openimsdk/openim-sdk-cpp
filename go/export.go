@@ -77,16 +77,28 @@ func NewConversationCallback(cCallback C.CB_I_S) *ConversationCallback {
 	return &ConversationCallback{cCallback: cCallback}
 }
 
-func (c ConversationCallback) OnSyncServerStart() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, NO_DATA)
+func (c ConversationCallback) OnSyncServerStart(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, C.CString(StructToJsonString(m)))
 }
 
-func (c ConversationCallback) OnSyncServerFinish() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, NO_DATA)
+func (c ConversationCallback) OnSyncServerProgress(progress int) {
+	m := make(map[string]any)
+	m["progress"] = progress
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_PROGRESS, C.CString(StructToJsonString(m)))
 }
 
-func (c ConversationCallback) OnSyncServerFailed() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, NO_DATA)
+func (c ConversationCallback) OnSyncServerFinish(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, C.CString(StructToJsonString(m)))
+}
+
+func (c ConversationCallback) OnSyncServerFailed(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, C.CString(StructToJsonString(m)))
 }
 
 func (c ConversationCallback) OnNewConversation(conversationList string) {
