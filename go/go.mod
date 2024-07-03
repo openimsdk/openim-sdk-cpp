@@ -2,7 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.21
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.0-rc.0
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.0-rc.1
 
 require (
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -16,7 +16,7 @@ require (
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/openimsdk/protocol v0.0.69-alpha.16 // indirect
-	github.com/openimsdk/tools v0.0.49-alpha.12 // indirect
+	github.com/openimsdk/tools v0.0.49-alpha.40 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.13 // indirect
