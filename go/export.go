@@ -65,6 +65,10 @@ func (c ConnCallback) OnUserTokenExpired() {
 	C.Call_CB_I_S(c.cCallback, USER_TOKEN_EXPIRED, NO_DATA)
 }
 
+func (c ConnCallback) OnUserTokenInvalid(errMsg string) {
+	C.Call_CB_I_S(c.cCallback, USER_TOKEN_INVALID, C.CString(errMsg))
+}
+
 type ConversationCallback struct {
 	cCallback C.CB_I_S
 }
@@ -73,16 +77,28 @@ func NewConversationCallback(cCallback C.CB_I_S) *ConversationCallback {
 	return &ConversationCallback{cCallback: cCallback}
 }
 
-func (c ConversationCallback) OnSyncServerStart() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, NO_DATA)
+func (c ConversationCallback) OnSyncServerStart(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_START, C.CString(StructToJsonString(m)))
 }
 
-func (c ConversationCallback) OnSyncServerFinish() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, NO_DATA)
+func (c ConversationCallback) OnSyncServerProgress(progress int) {
+	m := make(map[string]any)
+	m["progress"] = progress
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_PROGRESS, C.CString(StructToJsonString(m)))
 }
 
-func (c ConversationCallback) OnSyncServerFailed() {
-	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, NO_DATA)
+func (c ConversationCallback) OnSyncServerFinish(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FINISH, C.CString(StructToJsonString(m)))
+}
+
+func (c ConversationCallback) OnSyncServerFailed(reinstalled bool) {
+	m := make(map[string]any)
+	m["reinstalled"] = reinstalled
+	C.Call_CB_I_S(c.cCallback, SYNC_SERVER_FAILED, C.CString(StructToJsonString(m)))
 }
 
 func (c ConversationCallback) OnNewConversation(conversationList string) {
@@ -297,6 +313,10 @@ func (u UserCallback) OnSelfInfoUpdated(userInfo string) {
 func (u UserCallback) OnUserStatusChanged(statusMap string) {
 	C.Call_CB_I_S(u.cCallback, USER_STATUS_CHANGED, C.CString(statusMap))
 }
+
+func (u UserCallback) OnUserCommandAdd(userCommand string)    {}
+func (u UserCallback) OnUserCommandDelete(userCommand string) {}
+func (u UserCallback) OnUserCommandUpdate(userCommand string) {}
 
 type SendMessageCallback struct {
 	cCallback   C.CB_S_I_S_S_I
@@ -1093,6 +1113,14 @@ func set_group_member_info(cCallback C.CB_S_I_S_S, operationID *C.char, cGroupMe
 func get_joined_group_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetJoinedGroupList(baseCallback, C.GoString(operationID))
+}
+
+// GetJoinedGroupListPage retrieves the list of joined groups with pagination
+//
+//export get_joined_group_list_page
+func get_joined_group_list_page(cCallback C.CB_S_I_S_S, operationID *C.char, offset, count C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetJoinedGroupListPage(baseCallback, C.GoString(operationID), int32(offset), int32(count))
 }
 
 // GetSpecifiedGroupsInfo retrieves the information of specified groups
