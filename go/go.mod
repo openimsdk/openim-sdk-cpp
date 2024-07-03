@@ -2,10 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.21
 
-
-require github.com/openimsdk/openim-sdk-core/v3 v3.5.1
-
-replace github.com/openimsdk/openim-sdk-core/v3 => ./chao-sdk-core
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.0-rc.0
 
 require (
 	github.com/coreos/go-semver v0.3.0 // indirect
