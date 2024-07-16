@@ -1293,6 +1293,14 @@ func is_join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
 	open_im_sdk.IsJoinGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID))
 }
 
+// GetUsersInGroup retrieves the users in a group
+//
+//export get_users_in_group
+func get_users_in_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, userIDList *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetUsersInGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(userIDList))
+}
+
 func main() {
 
 }
