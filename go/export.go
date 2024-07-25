@@ -907,30 +907,6 @@ func update_msg_sender_info(cCallback C.CB_S_I_S_S, operationID *C.char, nicknam
 	open_im_sdk.UpdateMsgSenderInfo(baseCallback, C.GoString(operationID), C.GoString(nickname), C.GoString(faceURL))
 }
 
-//export subscribe_users_status
-func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
-//export unsubscribe_users_status
-func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.UnsubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
-//export get_subscribe_users_status
-func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetSubscribeUsersStatus(baseCallback, C.GoString(operationID))
-}
-
-//export get_user_status
-func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
 // =====================================================file===============================================
 //
 
@@ -1299,6 +1275,32 @@ func is_join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
 func get_users_in_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, userIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetUsersInGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(userIDList))
+}
+
+//export subscribe_users_status
+func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+// =====================================================online===============================================
+
+//export unsubscribe_users_status
+func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.UnsubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+//export get_subscribe_users_status
+func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetSubscribeUsersStatus(baseCallback, C.GoString(operationID))
+}
+
+//export get_user_status
+func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
 func main() {
