@@ -1277,13 +1277,13 @@ func get_users_in_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, userIDLis
 	open_im_sdk.GetUsersInGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(userIDList))
 }
 
+// =====================================================online===============================================
+
 //export subscribe_users_status
 func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
-
-// =====================================================online===============================================
 
 //export unsubscribe_users_status
 func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
