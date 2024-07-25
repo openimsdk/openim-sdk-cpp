@@ -2,7 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.21
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.0-rc.9
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.0-rc.14
 
 require (
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -14,7 +14,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
-	github.com/openimsdk/protocol v0.0.69-alpha.30 // indirect
+	github.com/openimsdk/protocol v0.0.69-alpha.37 // indirect
 	github.com/openimsdk/tools v0.0.49-alpha.44 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -23,6 +23,7 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/image v0.15.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
