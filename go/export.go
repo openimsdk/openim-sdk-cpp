@@ -1303,6 +1303,39 @@ func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.cha
 	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
+// =====================================================third===============================================
+
+func update_fcm_token(cCallback C.CB_S_I_S_S, operationID, fcmToken *C.char, expireTime C.longlong) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.UpdateFcmToken(baseCallback, C.GoString(operationID), C.GoString(fcmToken), int64(expireTime))
+}
+
+func set_app_Badge(cCallback C.CB_S_I_S_S, operationID *C.char, appUnreadCount C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetAppBadge(baseCallback, C.GoString(operationID), int32(appUnreadCount))
+}
+
+type UploadLogProgressCallback struct {
+	cCallback C.CB_I_S
+}
+
+func NewUpladLogProgressCallback(cCallback C.CB_I_S) *UploadLogProgressCallback {
+	return &UploadLogProgressCallback{cCallback: cCallback}
+}
+
+func (l UploadLogProgressCallback) OnProgress(current, size int64) {
+	m := make(map[string]any)
+	m["current"] = current
+	m["size"] = size
+	C.Call_CB_I_S(l.cCallback, ON_PROGRESS, C.CString(StructToJsonString(m)))
+}
+
+func upload_logs(cCallback C.CB_S_I_S_S, operationID *C.char, line C.int, ex *C.char, uploadLogProgressCallback C.CB_I_S) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	uploadLogCallback := NewUpladLogProgressCallback(uploadLogProgressCallback)
+	open_im_sdk.UploadLogs(baseCallback, C.GoString(operationID), int(line), C.GoString(ex), uploadLogCallback)
+}
+
 func main() {
 
 }
