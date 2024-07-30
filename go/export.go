@@ -418,6 +418,21 @@ func (u UploadFileCallback) Complete(size int64, url string, typ int) {
 	C.Call_CB_I_S(u.cCallback, COMPLETE, C.CString(StructToJsonString(m)))
 }
 
+type UploadLogProgressCallback struct {
+	cCallback C.CB_I_S
+}
+
+func NewUploadLogProgressCallback(cCallback C.CB_I_S) *UploadLogProgressCallback {
+	return &UploadLogProgressCallback{cCallback: cCallback}
+}
+
+func (l UploadLogProgressCallback) OnProgress(current, size int64) {
+	m := make(map[string]any)
+	m["current"] = current
+	m["size"] = size
+	C.Call_CB_I_S(l.cCallback, ON_PROGRESS, C.CString(StructToJsonString(m)))
+}
+
 // =====================================================global_callback===============================================
 
 //export set_group_listener
@@ -907,30 +922,6 @@ func update_msg_sender_info(cCallback C.CB_S_I_S_S, operationID *C.char, nicknam
 	open_im_sdk.UpdateMsgSenderInfo(baseCallback, C.GoString(operationID), C.GoString(nickname), C.GoString(faceURL))
 }
 
-//export subscribe_users_status
-func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
-//export unsubscribe_users_status
-func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.UnsubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
-//export get_subscribe_users_status
-func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetSubscribeUsersStatus(baseCallback, C.GoString(operationID))
-}
-
-//export get_user_status
-func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
 // =====================================================file===============================================
 //
 
@@ -1299,6 +1290,53 @@ func is_join_group(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char) {
 func get_users_in_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, userIDList *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetUsersInGroup(baseCallback, C.GoString(operationID), C.GoString(cGroupID), C.GoString(userIDList))
+}
+
+// =====================================================online===============================================
+
+//export subscribe_users_status
+func subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+//export unsubscribe_users_status
+func unsubscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.UnsubscribeUsersStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+//export get_subscribe_users_status
+func get_subscribe_users_status(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetSubscribeUsersStatus(baseCallback, C.GoString(operationID))
+}
+
+//export get_user_status
+func get_user_status(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetUserStatus(baseCallback, C.GoString(operationID), C.GoString(userIDs))
+}
+
+// =====================================================third===============================================
+
+//export update_fcm_token
+func update_fcm_token(cCallback C.CB_S_I_S_S, operationID, fcmToken *C.char, expireTime C.longlong) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.UpdateFcmToken(baseCallback, C.GoString(operationID), C.GoString(fcmToken), int64(expireTime))
+}
+
+//export set_app_Badge
+func set_app_Badge(cCallback C.CB_S_I_S_S, operationID *C.char, appUnreadCount C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SetAppBadge(baseCallback, C.GoString(operationID), int32(appUnreadCount))
+}
+
+//export upload_logs
+func upload_logs(cCallback C.CB_S_I_S_S, operationID *C.char, line C.int, ex *C.char, uploadLogProgressCallback C.CB_I_S) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	uploadLogCallback := NewUploadLogProgressCallback(uploadLogProgressCallback)
+	open_im_sdk.UploadLogs(baseCallback, C.GoString(operationID), int(line), C.GoString(ex), uploadLogCallback)
 }
 
 func main() {
