@@ -1339,6 +1339,12 @@ func upload_logs(cCallback C.CB_S_I_S_S, operationID *C.char, line C.int, ex *C.
 	open_im_sdk.UploadLogs(baseCallback, C.GoString(operationID), int(line), C.GoString(ex), uploadLogCallback)
 }
 
+// export logs
+func logs(cCallback C.CB_S_I_S_S, operationID *C.char, logLevel C.int, file *C.char, line C.int, msgs *C.char, err *C.char, keyAndValue *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.Logs(baseCallback, C.GoString(operationID), int(logLevel), C.GoString(file), int(line), C.GoString(msgs), C.GoString(err), C.GoString(keyAndValue))
+}
+
 func main() {
 
 }
