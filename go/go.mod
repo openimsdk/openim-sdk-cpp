@@ -2,7 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.21
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.1-rc.7
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.1-rc.8
 
 require (
 	github.com/golang/protobuf v1.5.4 // indirect
