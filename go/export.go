@@ -682,7 +682,7 @@ func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conv
 //export set_conversations
 func set_conversations(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversations(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(req))
+	open_im_sdk.SetConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(req))
 }
 
 //export hide_conversation
@@ -862,9 +862,9 @@ func upload_file(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char, uploa
 // =====================================================relation===============================================
 //
 //export get_specified_friends_info
-func get_specified_friends_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char) {
+func get_specified_friends_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char, filterBlack C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, C.GoString(operationID), C.GoString(userIDList))
+	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, C.GoString(operationID), C.GoString(userIDList), parseBool(int(filterBlack)))
 }
 
 //export get_friend_list
