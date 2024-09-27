@@ -679,8 +679,8 @@ func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conv
 	open_im_sdk.GetMultipleConversation(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
 }
 
-//export set_conversations
-func set_conversations(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, req *C.char) {
+//export set_conversation
+func set_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(req))
 }
