@@ -24,9 +24,9 @@ jobs:
             - os: windows-latest
               arch: amd64
               build: buildWindows
-            - os: windows-latest
-              arch: 386
-              build: buildWindows
+            # - os: windows-latest
+            #   arch: 386
+            #   build: buildWindows386
   
       steps:
         - name: Checkout code
@@ -39,11 +39,18 @@ jobs:
   
         - name: Check Go version
           run: go version
-  
+
+        - name: Install ARM64 cross-compilation toolchain
+          if: matrix.arch == 'arm64' && matrix.os == 'ubuntu-latest'
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            echo "CC=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+            echo "CXX=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+
         - name: Setup and build on Windows ${{ matrix.arch }}
           if: runner.os == 'Windows'
           run: |
-            echo "GOARCH=${{ matrix.arch }}" >> $GITHUB_ENV
             ./bootstrap_install_mage.bat
             mage ${{ matrix.build }}
 
@@ -51,7 +58,8 @@ jobs:
           if: runner.os != 'Windows'
           run: |
             sudo bash ./bootstrap_install_mage.sh
-            sudo mage ${{ matrix.build }}
+            export GOARCH=${{ matrix.arch }}
+            sudo -E mage ${{ matrix.build }}
   
         - name: Upload Artifacts
           uses: actions/upload-artifact@v4
