@@ -5,7 +5,7 @@ export CFLAGS="-arch arm64 -miphoneos-version-min=9.0 -isysroot "$(xcrun -sdk ip
 export CGO_LDFLAGS="-arch arm64 -miphoneos-version-min=9.0 -isysroot "$(xcrun -sdk iphoneos --show-sdk-path)  
 export CGO_ENABLED=1 
 export GOARCH=arm64 
-export GOOS=darwin 
+export GOOS=ios
 export CC="clang $CFLAGS $CGO_LDFLAGS" 
 go build -tags ios -ldflags=-w -trimpath -v -o libopenimsdk.a -buildmode c-archive export.go protocol.go message.go
 # go build -tags ios -ldflags=-w -trimpath -v -o libopenimsdk_ios.a -buildmode c-archive export.go protocol.go message.go
