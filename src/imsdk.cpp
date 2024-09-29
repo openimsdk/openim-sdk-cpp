@@ -1,9 +1,10 @@
-#include "IMSDK.h"
+#include "imsdk.h"
 
 #include <iostream>
 #include <sstream>
 #include "json.hpp"
 using json = nlohmann::json;
+
 char *GetOperationId(const char *prefix)
 {
     static int operationIndex = 0;
@@ -15,6 +16,5 @@ char *GetOperationId(const char *prefix)
 
 void OpenIM::InitSDK()
 {
-       
     init_sdk(GetOperationId("init_sdk"), "");
 }
