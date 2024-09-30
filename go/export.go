@@ -679,22 +679,10 @@ func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conv
 	open_im_sdk.GetMultipleConversation(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
 }
 
-//export set_conversation_msg_destruct_time
-func set_conversation_msg_destruct_time(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, msgDestructTime C.longlong) {
+//export set_conversation
+func set_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationMsgDestructTime(baseCallback, C.GoString(operationID), C.GoString(conversationID), int64(msgDestructTime))
-}
-
-//export set_conversation_is_msg_destruct
-func set_conversation_is_msg_destruct(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isMsgDestruct C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationIsMsgDestruct(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isMsgDestruct)))
-}
-
-//export set_conversation_ex
-func set_conversation_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, ex *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(ex))
+	open_im_sdk.SetConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(req))
 }
 
 //export hide_conversation
@@ -703,47 +691,10 @@ func hide_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversation
 	open_im_sdk.HideConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID))
 }
 
-//export get_conversation_recv_message_opt
-func get_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationIDList *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
-}
-
 //export set_conversation_draft
 func set_conversation_draft(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, draftText *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetConversationDraft(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(draftText))
-}
-
-//export reset_conversation_group_at_type
-func reset_conversation_group_at_type(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.ResetConversationGroupAtType(baseCallback, C.GoString(operationID), C.GoString(conversationID))
-}
-
-//export pin_conversation
-func pin_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPinned C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.PinConversation(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(isPinned)))
-}
-
-//export set_conversation_private_chat
-func set_conversation_private_chat(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, isPrivate C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationPrivateChat(baseCallback, C.GoString(operationID), C.GoString(conversationID),
-		parseBool(int(isPrivate)))
-}
-
-//export set_conversation_burn_duration
-func set_conversation_burn_duration(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, duration C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationBurnDuration(baseCallback, C.GoString(operationID), C.GoString(conversationID), int32(duration))
-}
-
-//export set_conversation_recv_message_opt
-func set_conversation_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, opt C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetConversationRecvMessageOpt(baseCallback, C.GoString(operationID), C.GoString(conversationID), int(opt))
 }
 
 //export get_total_unread_msg_count
@@ -886,40 +837,16 @@ func get_users_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char
 	open_im_sdk.GetUsersInfo(baseCallback, C.GoString(operationID), C.GoString(userIDs))
 }
 
-//export get_users_info_with_cache
-func get_users_info_with_cache(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char, groupID *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetUsersInfoWithCache(baseCallback, C.GoString(operationID), C.GoString(userIDs), C.GoString(groupID))
-}
-
-//export get_users_info_from_srv
-func get_users_info_from_srv(cCallback C.CB_S_I_S_S, operationID *C.char, userIDs *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetUsersInfoFromSrv(baseCallback, C.GoString(operationID), C.GoString(userIDs))
-}
-
 //export set_self_info
 func set_self_info(cCallback C.CB_S_I_S_S, operationID *C.char, userInfo *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetSelfInfo(baseCallback, C.GoString(operationID), C.GoString(userInfo))
 }
 
-//export set_global_recv_message_opt
-func set_global_recv_message_opt(cCallback C.CB_S_I_S_S, operationID *C.char, opt C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGlobalRecvMessageOpt(baseCallback, C.GoString(operationID), int(opt))
-}
-
 //export get_self_user_info
 func get_self_user_info(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetSelfUserInfo(baseCallback, C.GoString(operationID))
-}
-
-//export update_msg_sender_info
-func update_msg_sender_info(cCallback C.CB_S_I_S_S, operationID *C.char, nickname *C.char, faceURL *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.UpdateMsgSenderInfo(baseCallback, C.GoString(operationID), C.GoString(nickname), C.GoString(faceURL))
 }
 
 // =====================================================file===============================================
@@ -932,24 +859,24 @@ func upload_file(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char, uploa
 	open_im_sdk.UploadFile(baseCallback, C.GoString(operationID), C.GoString(req), uploadFileCallback)
 }
 
-// =====================================================friend===============================================
+// =====================================================relation===============================================
 //
 //export get_specified_friends_info
-func get_specified_friends_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char) {
+func get_specified_friends_info(cCallback C.CB_S_I_S_S, operationID *C.char, userIDList *C.char, filterBlack C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, C.GoString(operationID), C.GoString(userIDList))
+	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, C.GoString(operationID), C.GoString(userIDList), parseBool(int(filterBlack)))
 }
 
 //export get_friend_list
-func get_friend_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
+func get_friend_list(cCallback C.CB_S_I_S_S, operationID *C.char, filterBlack C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetFriendList(baseCallback, C.GoString(operationID))
+	open_im_sdk.GetFriendList(baseCallback, C.GoString(operationID), parseBool(int(filterBlack)))
 }
 
 //export get_friend_list_page
-func get_friend_list_page(cCallback C.CB_S_I_S_S, operationID *C.char, offset C.int, count C.int) {
+func get_friend_list_page(cCallback C.CB_S_I_S_S, operationID *C.char, offset C.int, count C.int, filterBlack C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetFriendListPage(baseCallback, C.GoString(operationID), int32(offset), int32(count))
+	open_im_sdk.GetFriendListPage(baseCallback, C.GoString(operationID), int32(offset), int32(count), parseBool(int(filterBlack)))
 }
 
 //export search_friends
@@ -970,10 +897,10 @@ func add_friend(cCallback C.CB_S_I_S_S, operationID *C.char, userIDReqMsg *C.cha
 	open_im_sdk.AddFriend(baseCallback, C.GoString(operationID), C.GoString(userIDReqMsg))
 }
 
-//export set_friend_remark
-func set_friend_remark(cCallback C.CB_S_I_S_S, operationID *C.char, userIDRemark *C.char) {
+//export update_friends
+func update_friends(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetFriendRemark(baseCallback, C.GoString(operationID), C.GoString(userIDRemark))
+	open_im_sdk.UpdateFriends(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 //export delete_friend
@@ -1022,12 +949,6 @@ func get_black_list(cCallback C.CB_S_I_S_S, operationID *C.char) {
 func remove_black(cCallback C.CB_S_I_S_S, operationID *C.char, removeUserID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.RemoveBlack(baseCallback, C.GoString(operationID), C.GoString(removeUserID))
-}
-
-//export set_friends_ex
-func set_friends_ex(cCallback C.CB_S_I_S_S, operationID, friendIDs, ex *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetFriendsEx(baseCallback, C.GoString(operationID), C.GoString(friendIDs), C.GoString(ex))
 }
 
 // =====================================================group===============================================
@@ -1081,15 +1002,6 @@ func change_group_member_mute(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUs
 		int(cMutedSeconds))
 }
 
-// SetGroupMemberRoleLevel sets the role level of a group member
-//
-//export set_group_member_role_level
-func set_group_member_role_level(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID *C.char, cRoleLevel C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupMemberRoleLevel(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cUserID), int(cRoleLevel))
-}
-
 // SetGroupMemberInfo sets the information of a group member
 //
 //export set_group_member_info
@@ -1136,30 +1048,6 @@ func search_groups(cCallback C.CB_S_I_S_S, operationID, cSearchParam *C.char) {
 func set_group_info(cCallback C.CB_S_I_S_S, operationID, cGroupInfo *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetGroupInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupInfo))
-}
-
-// SetGroupVerification sets the verification mode of a group
-//
-//export set_group_verification
-func set_group_verification(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cVerification C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupVerification(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cVerification))
-}
-
-// SetGroupLookMemberInfo sets the member information visibility of a group
-//
-//export set_group_look_member_info
-func set_group_look_member_info(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cRule C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupLookMemberInfo(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
-}
-
-// SetGroupApplyMemberFriend sets the friend rule for group applicants
-//
-//export set_group_apply_member_friend
-func set_group_apply_member_friend(cCallback C.CB_S_I_S_S, operationID, cGroupID *C.char, cRule C.int) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupApplyMemberFriend(baseCallback, C.GoString(operationID), C.GoString(cGroupID), int32(cRule))
 }
 
 // GetGroupMemberList retrieves the list of group members
@@ -1259,15 +1147,6 @@ func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 		C.GoString(cFromUserID), C.GoString(cHandleMsg))
 }
 
-// SetGroupMemberNickname sets the nickname of a group member
-//
-//export set_group_member_nickname
-func set_group_member_nickname(cCallback C.CB_S_I_S_S, operationID, cGroupID, cUserID, cGroupMemberNickname *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.SetGroupMemberNickname(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
-		C.GoString(cUserID), C.GoString(cGroupMemberNickname))
-}
-
 // SearchGroupMembers searches for group members
 //
 //export search_group_members
@@ -1337,6 +1216,12 @@ func upload_logs(cCallback C.CB_S_I_S_S, operationID *C.char, line C.int, ex *C.
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	uploadLogCallback := NewUploadLogProgressCallback(uploadLogProgressCallback)
 	open_im_sdk.UploadLogs(baseCallback, C.GoString(operationID), int(line), C.GoString(ex), uploadLogCallback)
+}
+
+//export logs
+func logs(cCallback C.CB_S_I_S_S, operationID *C.char, logLevel C.int, file *C.char, line C.int, msgs *C.char, err *C.char, keyAndValue *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.Logs(baseCallback, C.GoString(operationID), int(logLevel), C.GoString(file), int(line), C.GoString(msgs), C.GoString(err), C.GoString(keyAndValue))
 }
 
 func main() {
