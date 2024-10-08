@@ -8,9 +8,11 @@ const (
 	Msg_ConnectFailed
 	Msg_KickedOffline
 	Msg_UserTokenExpired
+	Msg_UserTokenInvalid
 
 	Msg_SyncServerStart
 	Msg_SyncServerFinish
+	Msg_SyncServerProgress
 	Msg_SyncServerFailed
 	Msg_NewConversation
 	Msg_ConversationChanged
@@ -57,6 +59,9 @@ const (
 
 	Msg_SelfInfoUpdated
 	Msg_UserStatusChanged
+	Msg_UserCommandAdd
+	Msg_UserCommandDelete
+	Msg_UserCommandUpdate
 
 	Msg_SendMessage_Error
 	Msg_SendMessage_Success
@@ -105,6 +110,7 @@ const (
 
 type Empty struct {
 }
+
 type Error struct {
 	OperationID string `json:"operationId"`
 	ErrCode     int32  `json:"errCode"`
