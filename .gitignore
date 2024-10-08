@@ -1,5 +1,6 @@
 *.o
 *.obj
+*.h
 *.gch
 *.pch
 *.so
