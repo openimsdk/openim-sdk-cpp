@@ -127,11 +127,26 @@ func BuildWindows() error {
 	fmt.Println("Building for Windows...")
 
 	outPath += "windows"
+	arch := os.Getenv("GOARCH")
+	cc := os.Getenv("CC")
+	cxx := os.Getenv("CXX")
+
+	if len(arch) == 0 {
+		arch = runtime.GOARCH
+	}
+
+	if len(cc) == 0 {
+		cc = "gcc"
+	}
+
+	if len(cxx) != 0 {
+		os.Setenv("CXX", cxx)
+	}
 
 	os.Setenv("GOOS", "windows")
-	os.Setenv("GOARCH", "amd64")
+	os.Setenv("GOARCH", arch)
 	os.Setenv("CGO_ENABLED", "1")
-	os.Setenv("CC", "gcc")
+	os.Setenv("CC", cc)
 
 	cmd := exec.Command("go", "build", "-buildmode=c-shared", "-trimpath", "-ldflags=-s -w", "-o", outPath+"/"+soName+".dll", ".")
 	cmd.Dir = goSrc
