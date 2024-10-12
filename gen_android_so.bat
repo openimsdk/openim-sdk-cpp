@@ -1,4 +1,6 @@
 set NDK_PATH=D:\Android\SDK\ndk\21.3.6528147
+@REM First set the NDK_PATH environment variable
+
 set SO_NAME=libopenimsdk
 set OUT_PATH=android\
 
