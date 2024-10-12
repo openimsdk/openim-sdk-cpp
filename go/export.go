@@ -502,6 +502,24 @@ func logout(cCallback C.CB_S_I_S_S, operationID *C.char) {
 	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
 }
 
+/*
+ 	`im_login` and `im_logout` is used only when there is a conflict with system functions on macOS,
+	 as the Dart compiler may conflict with the system functions `login` and `logout`.
+	 You can use `im_login` and `im_logout` to avoid conflicts when conflict happen.
+*/
+
+//export im_login
+func im_login(cCallback C.CB_S_I_S_S, operationID, uid, token *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.Login(baseCallback, C.GoString(operationID), C.GoString(uid), C.GoString(token))
+}
+
+//export im_logout
+func im_logout(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.Logout(baseCallback, C.GoString(operationID))
+}
+
 //export set_app_background_status
 func set_app_background_status(cCallback C.CB_S_I_S_S, operationID *C.char, isBackground C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
@@ -827,6 +845,18 @@ func search_local_messages(cCallback C.CB_S_I_S_S, operationID *C.char, searchPa
 func set_message_local_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, clientMsgID *C.char, localEx *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.SetMessageLocalEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID), C.GoString(localEx))
+}
+
+// export change_input_states
+func change_input_states(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, inputStatus C.int) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.ChangeInputStates(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(inputStatus)))
+}
+
+//export get_input_states
+func get_input_states(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, userID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetInputStates(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(userID))
 }
 
 // =====================================================user===============================================
