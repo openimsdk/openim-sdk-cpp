@@ -67,7 +67,7 @@ const (
 	Msg_SendMessage_Success
 	Msg_SendMessage_Progress
 
-	Msg_ErrorOrSuc
+	Msg_ActiveCall
 )
 
 const (
@@ -108,33 +108,4 @@ const (
 	DataType_LocalGroupRequest_List
 )
 
-type Empty struct {
-}
 
-type Error struct {
-	OperationID string `json:"operationId"`
-	ErrCode     int32  `json:"errCode"`
-	ErrMsg      string `json:"errMsg"`
-}
-type Success struct {
-	OperationID string `json:"operationId"`
-	Data        string `json:"data"`
-	DataType    int    `json:"dataType"`
-}
-type ErrorOrSuccess struct {
-	OperationID string `json:"operationId"`
-	ErrCode     int32  `json:"errCode"`
-	Data        string `json:"data"`
-	DataType    int    `json:"dataType"`
-	ErrMsg      string `json:"errMsg"`
-}
-
-type Progress struct {
-	OperationID string `json:"operationId"`
-	Progress    int    `json:"progress"`
-}
-
-type MsgIDAndList struct {
-	Id   string `json:"msgId"`
-	List string `json:"list"`
-}
