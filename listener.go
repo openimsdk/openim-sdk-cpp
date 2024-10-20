@@ -240,7 +240,7 @@ func (s SendMessageCallback) OnError(errCode int32, errMsg string) {
 }
 
 func (s SendMessageCallback) OnSuccess(data string) {
-	DispatorMsg(Msg_SendMessage_Success, Success{OperationId: s.operationId, Data: data, DataType: DataType_MsgStruct})
+	DispatorMsg(Msg_SendMessage_Success, Success{OperationId: s.operationId, Data: data, DataType: DataType_Message})
 }
 
 func (s SendMessageCallback) OnProgress(progress int) {

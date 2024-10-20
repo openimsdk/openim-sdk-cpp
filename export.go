@@ -34,6 +34,8 @@ func call_api(_apiKey C.int, jsonArgsStr *C.char) *C.char {
 	return C.CString(res)
 }
 
+// Actively release functions with return values ​​to avoid memory leakage
+//
 //export free_data
 func free_data(p *C.char) {
 	C.free(unsafe.Pointer(p))
@@ -58,7 +60,6 @@ func DispatorMsg(msgId int, msg interface{}) {
 	}
 	var cdata = C.CString(data)
 	C.CallMessageHandler(C.messageHandler, C.int(msgId), cdata)
-	// free memeory
 	C.free(unsafe.Pointer(cdata))
 }
 

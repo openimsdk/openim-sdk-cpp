@@ -74,38 +74,33 @@ const (
 	DataType_Empty = iota
 	DataType_Int
 	DataType_Bool
-	DataType_LocalConversation
-	DataType_LocalConversation_List
-	DataType_GetConversationRecvMessageOptResp_List
-	DataType_FindMessageList
-	DataType_GetAdvancedHistoryMessageList
-	DataType_MsgStruct
-	DataType_SearchLocalMessagesCallback
-	DataType_FullUserInfo
-	DataType_FullUserInfo_List
-	DataType_FullUserInfoWithCache
-	DataType_FullUserInfoWithCache_List
-	DataType_LocalUser
-	DataType_LocalUser_List
+	DataType_StringArray
+	DataType_Conversation
+	DataType_Conversation_List
+	DataType_FindMessageResult
+	DataType_AdvancedHistoryMessageResult
+	DataType_Message
+	DataType_SearchMessagesResult
+	DataType_UserInfo
+	DataType_UserInfo_List
+	DataType_PublicUserInfo
+	DataType_PublicUserInfo_List
 	DataType_OnlineStatus
 	DataType_OnlineStatus_List
 	DataType_SearchFriendItem
 	DataType_SearchFriendItem_List
 	DataType_UserIDResult
 	DataType_UserIDResult_List
-	DataType_LocalFriendRequest
-	DataType_LocalFriendRequest_List
-	DataType_LocalBlack
-	DataType_LocalBlack_List
+	DataType_FriendInfo
+	DataType_FriendInfo_List
+	DataType_FriendApplicationInfo
+	DataType_FriendApplicationInfo_List
+	DataType_BlackInfo
+	DataType_BlackInfo_List
 	DataType_GroupInfo
-	DataType_LocalGroup
-	DataType_LocalGroup_List
-	DataType_LocalGroupMember
-	DataType_LocalGroupMember_List
-	DataType_LocalAdminGroupRequest
-	DataType_LocalAdminGroupRequest_List
-	DataType_LocalGroupRequest
-	DataType_LocalGroupRequest_List
+	DataType_GroupInfo_List
+	DataType_GroupMember
+	DataType_GroupMember_List
+	DataType_GroupApplicationInfo
+	DataType_GroupApplicationInfo_List
 )
-
-
