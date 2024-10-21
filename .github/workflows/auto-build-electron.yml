@@ -24,9 +24,9 @@ jobs:
             - os: windows-latest
               arch: amd64
               build: buildWindows
-            # - os: windows-latest
-            #   arch: 386
-            #   build: buildWindows386
+            - os: windows-latest
+              arch: 386
+              build: buildWindows
   
       steps:
         - name: Checkout code
@@ -48,10 +48,23 @@ jobs:
             echo "CC=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
             echo "CXX=aarch64-linux-gnu-g++" >> $GITHUB_ENV
 
+        - name: Install MinGW-w64 using Chocolatey
+          if: runner.os == 'Windows' && matrix.arch == '386'
+          run: |
+            curl -L -o mingw32.7z https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z/download
+            7z x mingw32.7z -oC:/mingw32
+
         - name: Setup and build on Windows ${{ matrix.arch }}
           if: runner.os == 'Windows'
           run: |
             ./bootstrap_install_mage.bat
+            $env:GOARCH="${{ matrix.arch }}"
+            if ($env:GOARCH -eq "386") {
+              $env:PATH = "C:/mingw32/bin;$env:PATH"
+              gcc --version
+              $env:CC="gcc -m32"
+              $env:CXX="g++ -m32"
+            }
             mage ${{ matrix.build }}
 
         - name: Setup and build on ${{ matrix.os }} ${{ matrix.arch }}
