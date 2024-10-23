@@ -847,7 +847,7 @@ func set_message_local_ex(cCallback C.CB_S_I_S_S, operationID *C.char, conversat
 	open_im_sdk.SetMessageLocalEx(baseCallback, C.GoString(operationID), C.GoString(conversationID), C.GoString(clientMsgID), C.GoString(localEx))
 }
 
-// export change_input_states
+//export change_input_states
 func change_input_states(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, inputStatus C.int) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.ChangeInputStates(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(inputStatus)))
