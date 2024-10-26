@@ -7,7 +7,7 @@ export CGO_ENABLED=1
 export GOARCH=arm64 
 export GOOS=ios
 export CC="clang $CFLAGS $CGO_LDFLAGS" 
-go build -tags ios -ldflags=-w -trimpath -v -o libopenimsdk.a -buildmode c-archive ./
+go build -tags ios -ldflags=-w -trimpath -v -o ./ios/libopenimsdk.a -buildmode c-archive ./
 # go build -tags ios -ldflags=-w -trimpath -v -o libopenimsdk_ios.a -buildmode c-archive ./
 # ios simulator
 # export CFLAGS="-arch x86_64 -miphoneos-version-min=9.0 -isysroot "$(xcrun -sdk iphonesimulator --show-sdk-path) 
