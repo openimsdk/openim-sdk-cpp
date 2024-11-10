@@ -97,6 +97,7 @@ const (
 	API_ChangeGroupMemberMute
 	API_SetGroupMemberInfo
 	API_GetJoinedGroupList
+	API_GetJoinedGroupListPage
 	API_GetSpecifiedGroupsInfo
 	API_SearchGroups
 	API_SetGroupInfo
@@ -113,6 +114,7 @@ const (
 	API_RefuseGroupApplication
 	API_SearchGroupMembers
 	API_IsJoinGroup
+	API_GetUsersInGroup
 )
 
 type APIFUNC func(string) (string, error)
@@ -210,6 +212,7 @@ func init() {
 	apiFuncMap[API_ChangeGroupMemberMute] = change_group_member_mute
 	apiFuncMap[API_SetGroupMemberInfo] = set_group_member_info
 	apiFuncMap[API_GetJoinedGroupList] = get_joined_group_list
+	apiFuncMap[API_GetJoinedGroupListPage] = get_joined_group_list_page
 	apiFuncMap[API_GetSpecifiedGroupsInfo] = get_specified_groups_info
 	apiFuncMap[API_SearchGroups] = search_groups
 	apiFuncMap[API_SetGroupInfo] = set_group_info
@@ -226,6 +229,7 @@ func init() {
 	apiFuncMap[API_RefuseGroupApplication] = refuse_group_application
 	apiFuncMap[API_SearchGroupMembers] = search_group_members
 	apiFuncMap[API_IsJoinGroup] = is_join_group
+	apiFuncMap[API_GetUsersInGroup] = get_users_in_group
 }
 
 func GetAPIFunc(key int) (APIFUNC, bool) {
@@ -669,7 +673,7 @@ func get_all_conversation_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalConversation_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Conversation_List)
 	open_im_sdk.GetAllConversationList(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -684,7 +688,7 @@ func get_conversation_list_split(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalConversation_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Conversation_List)
 	open_im_sdk.GetConversationListSplit(baseCallback, args.OperationId, args.Offset, args.Count)
 	return "", err
 }
@@ -699,7 +703,7 @@ func get_one_conversation(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalConversation)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Conversation)
 	open_im_sdk.GetOneConversation(baseCallback, args.OperationId, args.SessionType, args.SourceId)
 	return "", nil
 }
@@ -713,7 +717,7 @@ func get_multiple_conversation(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalConversation_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Conversation_List)
 	open_im_sdk.GetMultipleConversation(baseCallback, args.OperationId, args.ConversationIdList)
 	return "", nil
 }
@@ -848,7 +852,7 @@ func find_message_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_FindMessageList)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FindMessageResult)
 	open_im_sdk.FindMessageList(baseCallback, args.OperationId, args.FindMessageOptions)
 	return "", nil
 }
@@ -862,7 +866,7 @@ func get_advanced_history_message_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_GetAdvancedHistoryMessageList)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_AdvancedHistoryMessageResult)
 	open_im_sdk.GetAdvancedHistoryMessageList(baseCallback, args.OperationId, args.GetMessageOptions)
 	return "", nil
 }
@@ -876,7 +880,7 @@ func get_advanced_history_message_list_reverse(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_GetAdvancedHistoryMessageList)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_AdvancedHistoryMessageResult)
 	open_im_sdk.GetAdvancedHistoryMessageListReverse(baseCallback, args.OperationId, args.GetMessageOptions)
 	return "", nil
 }
@@ -891,7 +895,7 @@ func revoke_message(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_GetAdvancedHistoryMessageList)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Empty)
 	open_im_sdk.RevokeMessage(baseCallback, args.OperationId, args.ConversationId, args.ClientMsgId)
 	return "", nil
 }
@@ -1033,7 +1037,7 @@ func insert_single_message_to_local_storage(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_MsgStruct)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Message)
 	open_im_sdk.InsertSingleMessageToLocalStorage(baseCallback, args.OperationId, args.Message, args.RecvId, args.SendId)
 	return "", nil
 }
@@ -1049,7 +1053,7 @@ func insert_group_message_to_local_storage(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_MsgStruct)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_Message)
 	open_im_sdk.InsertGroupMessageToLocalStorage(baseCallback, args.OperationId, args.Message, args.GroupId, args.SendId)
 	return "", nil
 }
@@ -1063,7 +1067,7 @@ func search_local_messages(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_SearchLocalMessagesCallback)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_SearchMessagesResult)
 	open_im_sdk.SearchLocalMessages(baseCallback, args.OperationId, args.SearchParam)
 	return "", nil
 }
@@ -1095,7 +1099,7 @@ func get_users_info(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_FullUserInfo_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_PublicUserInfo_List)
 	open_im_sdk.GetUsersInfo(baseCallback, args.OperationId, args.UserIds)
 	return "", nil
 }
@@ -1122,7 +1126,7 @@ func get_self_user_info(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalUser)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_UserInfo)
 	open_im_sdk.GetSelfUserInfo(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1193,7 +1197,7 @@ func get_specified_friends_info(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_FullUserInfo_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendInfo_List)
 	open_im_sdk.GetSpecifiedFriendsInfo(baseCallback, args.OperationId, args.UserIdList, args.FilterBlack)
 	return "", nil
 }
@@ -1207,7 +1211,7 @@ func get_friend_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_FullUserInfo_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendInfo_List)
 	open_im_sdk.GetFriendList(baseCallback, args.OperationId, args.FilterBlack)
 	return "", nil
 }
@@ -1223,7 +1227,7 @@ func get_friend_list_page(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_FullUserInfo_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendInfo_List)
 	open_im_sdk.GetFriendListPage(baseCallback, args.OperationId, args.Offset, args.Count, args.FilterBlack)
 	return "", nil
 }
@@ -1306,7 +1310,7 @@ func get_friend_application_list_as_recipient(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalFriendRequest_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendApplicationInfo_List)
 	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1319,7 +1323,7 @@ func get_friend_application_list_as_applicant(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalFriendRequest_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendApplicationInfo_List)
 	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1375,7 +1379,7 @@ func get_black_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalBlack_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_BlackInfo_List)
 	open_im_sdk.GetBlackList(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1508,8 +1512,23 @@ func get_joined_group_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroup_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupInfo_List)
 	open_im_sdk.GetJoinedGroupList(baseCallback, args.OperationId)
+	return "", nil
+}
+
+func get_joined_group_list_page(argsStr string) (string, error) {
+	args := struct {
+		OperationId string `json:"operationId"`
+		Offset      int32  `json:"offset"`
+		Count       int32  `json:"count"`
+	}{}
+	err := json.Unmarshal([]byte(argsStr), &args)
+	if err != nil {
+		return "", err
+	}
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupInfo_List)
+	open_im_sdk.GetJoinedGroupListPage(baseCallback, args.OperationId, args.Offset, args.Count)
 	return "", nil
 }
 
@@ -1522,7 +1541,7 @@ func get_specified_groups_info(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroup_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupInfo_List)
 	open_im_sdk.GetSpecifiedGroupsInfo(baseCallback, args.OperationId, args.GroupIdList)
 	return "", nil
 }
@@ -1536,7 +1555,7 @@ func search_groups(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroup_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupInfo_List)
 	open_im_sdk.SearchGroups(baseCallback, args.OperationId, args.SearchParam)
 	return "", nil
 }
@@ -1567,7 +1586,7 @@ func get_group_member_list(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupMember_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupMember_List)
 	open_im_sdk.GetGroupMemberList(baseCallback, args.OperationId, args.GroupId, args.Filter, args.Offset, args.Count)
 	return "", nil
 }
@@ -1581,7 +1600,7 @@ func get_group_member_owner_and_admin(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupMember_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupMember_List)
 	open_im_sdk.GetGroupMemberOwnerAndAdmin(baseCallback, args.OperationId, args.GroupId)
 	return "", nil
 }
@@ -1600,7 +1619,7 @@ func get_group_member_list_by_join_time_filter(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupMember_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupMember_List)
 	open_im_sdk.GetGroupMemberListByJoinTimeFilter(baseCallback, args.OperationId, args.GroupId, args.Offset, args.Count, args.JoinTimeBegin, args.JoinTimeEnd, args.FilterUserIdList)
 	return "", nil
 }
@@ -1615,7 +1634,7 @@ func get_specified_group_members_info(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupMember_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupMember_List)
 	open_im_sdk.GetSpecifiedGroupMembersInfo(baseCallback, args.OperationId, args.GroupId, args.UserIdList)
 	return "", nil
 }
@@ -1675,7 +1694,7 @@ func get_group_application_list_as_recipient(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalAdminGroupRequest_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupApplicationInfo_List)
 	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1688,7 +1707,7 @@ func get_group_application_list_as_applicant(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupRequest_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupApplicationInfo_List)
 	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, args.OperationId)
 	return "", nil
 }
@@ -1734,7 +1753,7 @@ func search_group_members(argsStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	baseCallback := NewBaseCallback(args.OperationId, DataType_LocalGroupMember_List)
+	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupMember_List)
 	open_im_sdk.SearchGroupMembers(baseCallback, args.OperationId, args.SearchParam)
 	return "", nil
 }
@@ -1750,5 +1769,20 @@ func is_join_group(argsStr string) (string, error) {
 	}
 	baseCallback := NewBaseCallback(args.OperationId, DataType_Bool)
 	open_im_sdk.IsJoinGroup(baseCallback, args.OperationId, args.GroupId)
+	return "", nil
+}
+
+func get_users_in_group(argsStr string) (string, error) {
+	args := struct {
+		OperationId string `json:"operationId"`
+		GroupId     string `json:"groupId"`
+		UserIdList  string `json:"userIdList"`
+	}{}
+	err := json.Unmarshal([]byte(argsStr), &args)
+	if err != nil {
+		return "", err
+	}
+	baseCallback := NewBaseCallback(args.OperationId, DataType_StringArray)
+	open_im_sdk.GetUsersInGroup(baseCallback, args.OperationId, args.GroupId, args.UserIdList)
 	return "", nil
 }
