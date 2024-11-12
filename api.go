@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+
 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk"
 )
 
@@ -1478,7 +1479,7 @@ func change_group_member_mute(argsStr string) (string, error) {
 	args := struct {
 		OperationId  string `json:"operationId"`
 		GroupId      string `json:"groupId"`
-		UserId       string `json:"userId "`
+		UserId       string `json:"userId"`
 		MutedSeconds int    `json:"mutedSeconds"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
@@ -1577,7 +1578,7 @@ func set_group_info(argsStr string) (string, error) {
 func get_group_member_list(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
-		GroupId     string `json:"groupId "`
+		GroupId     string `json:"groupId"`
 		Filter      int32  `json:"filter"`
 		Offset      int32  `json:"offset"`
 		Count       int32  `json:"count"`
@@ -1594,7 +1595,7 @@ func get_group_member_list(argsStr string) (string, error) {
 func get_group_member_owner_and_admin(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
-		GroupId     string `json:"groupId "`
+		GroupId     string `json:"groupId"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
 	if err != nil {
@@ -1608,7 +1609,7 @@ func get_group_member_owner_and_admin(argsStr string) (string, error) {
 func get_group_member_list_by_join_time_filter(argsStr string) (string, error) {
 	args := struct {
 		OperationId      string `json:"operationId"`
-		GroupId          string `json:"groupId "`
+		GroupId          string `json:"groupId"`
 		Offset           int32  `json:"offset"`
 		Count            int32  `json:"count"`
 		JoinTimeBegin    int64  `json:"joinTimeBegin"`
