@@ -247,7 +247,7 @@ func NewBaseCallback(operationId string, dataType int) *BaseCallback {
 	return &BaseCallback{OperationId: operationId, DataType: dataType}
 }
 func (b BaseCallback) OnError(errCode int32, errMsg string) {
-	DispatorMsg(Msg_ActiveCall, ErrorOrSuccess{OperationId: b.OperationId, ErrCode: errCode, ErrMsg: errMsg, DataType: DataType_Empty, Data: ""})
+	DispatorMsg(Msg_ActiveCall, ErrorOrSuccess{OperationId: b.OperationId, DataType: b.DataType, Data: "", ErrCode: errCode, ErrMsg: errMsg})
 }
 func (b BaseCallback) OnSuccess(data string) {
 	DispatorMsg(Msg_ActiveCall, ErrorOrSuccess{OperationId: b.OperationId, DataType: b.DataType, Data: data, ErrCode: -1, ErrMsg: ""})
