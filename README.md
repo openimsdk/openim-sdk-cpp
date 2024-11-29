@@ -1,6 +1,6 @@
 # openim-sdk-cpp
 
-openim-sdk-cpp is the C language export layer for the openim-sdk-core repository, designed to provide a simple integration method for C/C++ developers. With this SDK, developers can easily integrate OpenIM real-time messaging services into their C/C++ applications, enabling efficient handling of instant messaging, chat management, message pushing, and other features.
+openim-sdk-cpp is the C language export layer for the [openim-sdk-core](https://github.com/openimsdk/openim-sdk-core) repository, designed to provide a simple integration method for C/C++ developers. With this SDK, developers can easily integrate OpenIM real-time messaging services into their C/C++ applications, enabling efficient handling of instant messaging, chat management, message pushing, and other features.
 
 ## Setup
 ### 1. Setting Up Go Environment
