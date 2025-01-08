@@ -31,7 +31,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/openimsdk/protocol v0.0.72 // indirect
+	github.com/openimsdk/protocol v0.0.72-alpha.70 // indirect
 	github.com/openimsdk/tools v0.0.50-alpha.21 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
