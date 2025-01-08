@@ -853,12 +853,6 @@ func change_input_states(cCallback C.CB_S_I_S_S, operationID *C.char, conversati
 	open_im_sdk.ChangeInputStates(baseCallback, C.GoString(operationID), C.GoString(conversationID), parseBool(int(inputStatus)))
 }
 
-//export fetch_surrounding_messages
-func fetch_surrounding_messages(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
-	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.FetchSurroundingMessages(baseCallback, C.GoString(operationID), C.GoString(req))
-}
-
 //export get_input_states
 func get_input_states(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, userID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
