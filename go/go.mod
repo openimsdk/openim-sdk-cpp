@@ -1,8 +1,8 @@
 module github.com/openimsdk/openim-sdk-cpp
 
-go 1.21
+go 1.22.7
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.2-alpha.2
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.1
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
@@ -29,7 +29,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/openimsdk/protocol v0.0.72 // indirect
+	github.com/openimsdk/protocol v0.0.72-alpha.70 // indirect
 	github.com/openimsdk/tools v0.0.50-alpha.21 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
@@ -40,15 +40,15 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/image v0.15.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
-	google.golang.org/grpc v1.62.1 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/grpc v1.68.0 // indirect
+	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/sqlite v1.5.5 // indirect
 	gorm.io/gorm v1.25.10 // indirect
