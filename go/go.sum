@@ -64,8 +64,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
-github.com/openimsdk/openim-sdk-core/v3 v3.8.4-alpha.1 h1:lrd5qtDngosMDUsyvAWk8LLHQmP4FO4q+O63Cm9eNKg=
-github.com/openimsdk/openim-sdk-core/v3 v3.8.4-alpha.1/go.mod h1:paeW9bh3tdGDXAX7aiiiJFyYMCrr8nq01dhIMclqdNw=
+github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.1 h1:wFhq3Sf8MWoSB4Zm/CyRbKvZvyt58bkUHuZlrfbHgL8=
+github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.1/go.mod h1:paeW9bh3tdGDXAX7aiiiJFyYMCrr8nq01dhIMclqdNw=
 github.com/openimsdk/protocol v0.0.72-alpha.70 h1:j7vB81+rTthijRda2b8tlli9oWvPxr4yXHwZ8nPZIBQ=
 github.com/openimsdk/protocol v0.0.72-alpha.70/go.mod h1:Iet+piS/jaS+kWWyj6EEr36mk4ISzIRYjoMSVA4dq2M=
 github.com/openimsdk/tools v0.0.50-alpha.21 h1:ZKgSFkiBjz6KcNZlNwvrSoUYJ7K5Flan8wHuRBH3VqY=
