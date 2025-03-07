@@ -4,7 +4,7 @@ go 1.22.7
 
 toolchain go1.23.2
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.3
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.1
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
