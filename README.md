@@ -81,5 +81,15 @@ Once the login is successful, you can use other SDK methods to interact with Ope
 For detailed usage and API reference, please refer to the documentation in the openim-sdk-core repository.
 
 # License
-This project is licensed under the Apache 2.0 License. See the [LICENSE](https://github.com/openimsdk/openim-sdk-cpp/blob/main/LICENSE) file for more details.
+This software is licensed under a dual-license model:
+
+- The GNU Affero General Public License (AGPL), Version 3 or later; **OR**
+- Commercial license terms from OpenIMSDK.
+
+If you wish to use this software under commercial terms, please contact us at: contact@openim.io
+
+For more information, see: https://www.openim.io/en/licensing
+
+
+
 
