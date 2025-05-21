@@ -2,7 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.22.7
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.1
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.4
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
