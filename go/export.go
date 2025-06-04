@@ -940,15 +940,15 @@ func delete_friend(cCallback C.CB_S_I_S_S, operationID *C.char, friendUserID *C.
 }
 
 //export get_friend_application_list_as_recipient
-func get_friend_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char) {
+func get_friend_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, C.GoString(operationID))
+	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 //export get_friend_application_list_as_applicant
-func get_friend_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char) {
+func get_friend_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, C.GoString(operationID))
+	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 //export accept_friend_application
@@ -961,6 +961,12 @@ func accept_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, user
 func refuse_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, userIDHandleMsg *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.RefuseFriendApplication(baseCallback, C.GoString(operationID), C.GoString(userIDHandleMsg))
+}
+
+//export get_friend_application_unread_count
+func get_friend_application_unread_count(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetFriendApplicationUnhandledCount(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 //export add_black
@@ -1146,17 +1152,17 @@ func invite_user_to_group(cCallback C.CB_S_I_S_S, operationID, cGroupID, cReason
 // GetGroupApplicationListAsRecipient retrieves the group application list as a recipient
 //
 //export get_group_application_list_as_recipient
-func get_group_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char) {
+func get_group_application_list_as_recipient(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, C.GoString(operationID))
+	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 // GetGroupApplicationListAsApplicant retrieves the group application list as an applicant
 //
 //export get_group_application_list_as_applicant
-func get_group_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char) {
+func get_group_application_list_as_applicant(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
-	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, C.GoString(operationID))
+	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 // AcceptGroupApplication accepts a group application
@@ -1175,6 +1181,14 @@ func refuse_group_application(cCallback C.CB_S_I_S_S, operationID, cGroupID, cFr
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.RefuseGroupApplication(baseCallback, C.GoString(operationID), C.GoString(cGroupID),
 		C.GoString(cFromUserID), C.GoString(cHandleMsg))
+}
+
+// GetGroupApplicationUnhandledCount retrieves the count of unhandled group applications
+//
+//export get_group_application_unhandled_count
+func get_group_application_unhandled_count(cCallback C.CB_S_I_S_S, operationID, req *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.GetGroupApplicationUnhandledCount(baseCallback, C.GoString(operationID), C.GoString(req))
 }
 
 // SearchGroupMembers searches for group members
