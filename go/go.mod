@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.24.1
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.7
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.8
 
 require (
 	github.com/coder/websocket v1.8.13 // indirect
