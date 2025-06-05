@@ -963,8 +963,8 @@ func refuse_friend_application(cCallback C.CB_S_I_S_S, operationID *C.char, user
 	open_im_sdk.RefuseFriendApplication(baseCallback, C.GoString(operationID), C.GoString(userIDHandleMsg))
 }
 
-//export get_friend_application_unread_count
-func get_friend_application_unread_count(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
+//export get_friend_application_unhandled_count
+func get_friend_application_unhandled_count(cCallback C.CB_S_I_S_S, operationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.GetFriendApplicationUnhandledCount(baseCallback, C.GoString(operationID), C.GoString(req))
 }
