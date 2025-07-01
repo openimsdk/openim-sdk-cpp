@@ -69,35 +69,76 @@ jobs:
             $env:CC="gcc -m32"
             $env:CXX="g++ -m32"
           }
+
+          # Create shared directory structure if it doesn't exist
+          New-Item -ItemType Directory -Force -Path "shared/ios", "shared/linux", "shared/windows", "shared/android"
+
+          # Run the build
           mage ${{ matrix.build }}
+
+          # Create assets directory with proper naming
+          $tag_version = "${{ github.ref_name }}"
+          $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+          New-Item -ItemType Directory -Force -Path $archive_name
+
+          # Copy built files to assets directory
+          if (Test-Path "shared/windows" -PathType Container) {
+            Copy-Item -Path "shared/windows/*" -Destination $archive_name -Recurse -ErrorAction SilentlyContinue
+          }
 
       - name: Setup and build on ${{ matrix.os }} ${{ matrix.arch }}
         if: runner.os != 'Windows'
         run: |
           sudo bash ./bootstrap_install_mage.sh
           export GOARCH=${{ matrix.arch }}
+
+          # Create shared directory structure if it doesn't exist
+          mkdir -p shared/ios shared/linux shared/windows shared/android
+
+          # Additional setup for iOS ARM64 builds
+          if [[ "${{ matrix.build }}" == "buildIOS" && "${{ matrix.arch }}" == "arm64" ]]; then
+            # Ensure Xcode command line tools are available
+            xcode-select --install 2>/dev/null || true
+            echo "Building iOS library for ARM64..."
+          fi
+
+          # Run the build
           sudo -E mage ${{ matrix.build }}
 
-      - name: List built files (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $tag_version = "${{ github.ref_name }}"
-          $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
-          Write-Host "Checking directory: $archive_name"
-          if (Test-Path $archive_name) {
-            Get-ChildItem -Path $archive_name -Recurse
-          } else {
-            Write-Host "Directory $archive_name not found"
-          }
-
-      - name: List built files (Unix)
-        if: runner.os != 'Windows'
-        run: |
+          # Create assets directory with proper naming
           tag_version="${{ github.ref_name }}"
           archive_name="${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
-          echo "Checking directory: $archive_name"
-          ls -la $archive_name || echo "Directory $archive_name not found"
-          find $archive_name -type f || echo "No files found in $archive_name"
+          mkdir -p "$archive_name"
+
+          # Copy built files to assets directory
+          if [[ "${{ matrix.build }}" == "buildIOS" ]]; then
+            cp -r shared/ios/* "$archive_name/" 2>/dev/null || echo "No iOS files to copy"
+          elif [[ "${{ matrix.build }}" == "buildLinux" ]]; then
+            cp -r shared/linux/* "$archive_name/" 2>/dev/null || echo "No Linux files to copy"
+          elif [[ "${{ matrix.build }}" == "buildWindows" ]]; then
+            cp -r shared/windows/* "$archive_name/" 2>/dev/null || echo "No Windows files to copy"
+          fi
+
+      # - name: List built files (Windows)
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     $tag_version = "${{ github.ref_name }}"
+      #     $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+      #     Write-Host "Checking directory: $archive_name"
+      #     if (Test-Path $archive_name) {
+      #       Get-ChildItem -Path $archive_name -Recurse
+      #     } else {
+      #       Write-Host "Directory $archive_name not found"
+      #     }
+
+      # - name: List built files (Unix)
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     tag_version="${{ github.ref_name }}"
+      #     archive_name="${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+      #     echo "Checking directory: $archive_name"
+      #     ls -la $archive_name || echo "Directory $archive_name not found"
+      #     find $archive_name -type f || echo "No files found in $archive_name"
 
       - name: Create archive (Windows)
         if: runner.os == 'Windows'
