@@ -1,0 +1,185 @@
+name: Build assets in release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+            build: buildLinux
+            os_name: ubuntu
+          - os: ubuntu-latest
+            arch: arm64
+            build: buildLinux
+            os_name: ubuntu
+          - os: macos-latest
+            arch: amd64
+            build: buildIOS
+            os_name: macos
+          - os: macos-latest
+            arch: arm64
+            build: buildIOS
+            os_name: macos
+          - os: windows-latest
+            arch: amd64
+            build: buildWindows
+            os_name: windows
+          - os: windows-latest
+            arch: 386
+            build: buildWindows
+            os_name: windows
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install ARM64 cross-compilation toolchain
+        if: matrix.arch == 'arm64' && matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          echo "CC=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+          echo "CXX=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+
+      - name: Install MinGW-w64 using Chocolatey
+        if: runner.os == 'Windows' && matrix.arch == '386'
+        run: |
+          curl -L -o mingw32.7z https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z/download
+          7z x mingw32.7z -oC:/mingw32
+
+      - name: Setup and build on Windows ${{ matrix.arch }}
+        if: runner.os == 'Windows'
+        run: |
+          ./bootstrap_install_mage.bat
+          $env:GOARCH="${{ matrix.arch }}"
+          if ($env:GOARCH -eq "386") {
+            $env:PATH = "C:/mingw32/bin;$env:PATH"
+            gcc --version
+            $env:CC="gcc -m32"
+            $env:CXX="g++ -m32"
+          }
+
+          # Create shared directory structure if it doesn't exist
+          New-Item -ItemType Directory -Force -Path "shared/ios", "shared/linux", "shared/windows", "shared/android"
+
+          # Run the build
+          mage ${{ matrix.build }}
+
+          # Create assets directory with proper naming
+          $tag_version = "${{ github.ref_name }}"
+          $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+          New-Item -ItemType Directory -Force -Path $archive_name
+
+          # Copy built files to assets directory
+          if (Test-Path "shared/windows" -PathType Container) {
+            Copy-Item -Path "shared/windows/*" -Destination $archive_name -Recurse -ErrorAction SilentlyContinue
+          }
+
+      - name: Setup and build on ${{ matrix.os }} ${{ matrix.arch }}
+        if: runner.os != 'Windows'
+        run: |
+          sudo bash ./bootstrap_install_mage.sh
+          export GOARCH=${{ matrix.arch }}
+
+          # Create shared directory structure if it doesn't exist
+          mkdir -p shared/ios shared/linux shared/windows shared/android
+
+          # Additional setup for iOS ARM64 builds
+          if [[ "${{ matrix.build }}" == "buildIOS" && "${{ matrix.arch }}" == "arm64" ]]; then
+            # Ensure Xcode command line tools are available
+            xcode-select --install 2>/dev/null || true
+            echo "Building iOS library for ARM64..."
+          fi
+
+          # Run the build
+          sudo -E mage ${{ matrix.build }}
+
+          # Create assets directory with proper naming
+          tag_version="${{ github.ref_name }}"
+          archive_name="${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+          mkdir -p "$archive_name"
+
+          # Copy built files to assets directory
+          if [[ "${{ matrix.build }}" == "buildIOS" ]]; then
+            cp -r shared/ios/* "$archive_name/" 2>/dev/null || echo "No iOS files to copy"
+          elif [[ "${{ matrix.build }}" == "buildLinux" ]]; then
+            cp -r shared/linux/* "$archive_name/" 2>/dev/null || echo "No Linux files to copy"
+          elif [[ "${{ matrix.build }}" == "buildWindows" ]]; then
+            cp -r shared/windows/* "$archive_name/" 2>/dev/null || echo "No Windows files to copy"
+          fi
+
+      # - name: List built files (Windows)
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     $tag_version = "${{ github.ref_name }}"
+      #     $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+      #     Write-Host "Checking directory: $archive_name"
+      #     if (Test-Path $archive_name) {
+      #       Get-ChildItem -Path $archive_name -Recurse
+      #     } else {
+      #       Write-Host "Directory $archive_name not found"
+      #     }
+
+      # - name: List built files (Unix)
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     tag_version="${{ github.ref_name }}"
+      #     archive_name="${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+      #     echo "Checking directory: $archive_name"
+      #     ls -la $archive_name || echo "Directory $archive_name not found"
+      #     find $archive_name -type f || echo "No files found in $archive_name"
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $tag_version = "${{ github.ref_name }}"
+          $archive_name = "${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+
+          if (Test-Path $archive_name) {
+            $fileCount = (Get-ChildItem -Path $archive_name -File -Recurse).Count
+            if ($fileCount -gt 0) {
+              Compress-Archive -Path "$archive_name/*" -DestinationPath "$archive_name.zip" -Force
+              Write-Host "Created archive: $archive_name.zip"
+              Get-Item "$archive_name.zip"
+            } else {
+              Write-Host "No files found in $archive_name"
+              exit 1
+            }
+          } else {
+            Write-Host "Directory $archive_name not found"
+            exit 1
+          }
+
+      - name: Create archive (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tag_version="${{ github.ref_name }}"
+          archive_name="${{ matrix.os_name }}-${{ matrix.arch }}-$tag_version-assets"
+
+          if [ -d "$archive_name" ] && [ "$(find $archive_name -type f | wc -l)" -gt 0 ]; then
+            zip -r $archive_name.zip $archive_name/
+            echo "Created archive: $archive_name.zip"
+            ls -la $archive_name.zip
+          else
+            echo "No files found in $archive_name"
+            exit 1
+          fi
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.os_name }}-${{ matrix.arch }}-${{ github.ref_name }}-assets.zip
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
