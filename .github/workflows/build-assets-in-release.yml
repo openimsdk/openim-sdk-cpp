@@ -172,11 +172,6 @@ jobs:
           tag_version="${{ github.ref_name }}"
           repo="${{ github.repository }}"
 
-          release_info=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/$repo/releases/tags/$tag_version")
-
-          mkdir -p downloads
-
           declare -A asset_mapping
           asset_mapping["ubuntu-amd64-$tag_version-assets.zip"]="linux_x64"
           asset_mapping["ubuntu-arm64-$tag_version-assets.zip"]="linux_arm64"
@@ -185,30 +180,59 @@ jobs:
           asset_mapping["windows-amd64-$tag_version-assets.zip"]="win_x64"
           asset_mapping["windows-386-$tag_version-assets.zip"]="win_ia32"
 
-          for asset in "${!asset_mapping[@]}"; do
-            echo "Attempting to download: $asset"
+          gh release download "$tag_version" --repo "$repo" --dir downloads || true
+
+          if [ ! "$(ls -A downloads 2>/dev/null)" ]; then
+            echo "Falling back to API download method"
             
-            download_url=$(echo "$release_info" | jq -r --arg name "$asset" \
-              '.assets[] | select(.name == $name) | .browser_download_url')
-            
-            if [ "$download_url" != "null" ] && [ -n "$download_url" ]; then
-              echo "Downloading $asset from $download_url"
-              curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -o "downloads/$asset" "$download_url"
+            release_info=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/$repo/releases/tags/$tag_version")
+
+            mkdir -p downloads
+
+            for asset in "${!asset_mapping[@]}"; do
+              echo "Attempting to download: $asset"
               
-              if [ -f "downloads/$asset" ]; then
-                echo "Successfully downloaded: $asset ($(du -h "downloads/$asset" | cut -f1))"
-                echo "${asset}:${asset_mapping[$asset]}" >> downloads/mapping.txt
+              asset_id=$(echo "$release_info" | jq -r --arg name "$asset" \
+                '.assets[] | select(.name == $name) | .id')
+              
+              if [ "$asset_id" != "null" ] && [ -n "$asset_id" ]; then
+                echo "Downloading $asset (ID: $asset_id)"
+                
+                curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  -H "Accept: application/octet-stream" \
+                  -o "downloads/$asset" \
+                  "https://api.github.com/repos/$repo/releases/assets/$asset_id"
+                
+                if [ -f "downloads/$asset" ]; then
+                  if file "downloads/$asset" | grep -q "Zip archive"; then
+                    echo "Successfully downloaded: $asset ($(du -h "downloads/$asset" | cut -f1))"
+                    echo "${asset}:${asset_mapping[$asset]}" >> downloads/mapping.txt
+                  else
+                    echo "Downloaded file is not a valid ZIP archive: $asset"
+                    rm -f "downloads/$asset"
+                  fi
+                else
+                  echo "Failed to download: $asset"
+                fi
               else
-                echo "Failed to download: $asset"
+                echo "Asset not found in release: $asset"
               fi
-            else
-              echo "Asset not found in release: $asset"
-            fi
-          done
+            done
+          else
+            echo "Successfully downloaded using gh CLI"
+            
+            for asset in "${!asset_mapping[@]}"; do
+              if [ -f "downloads/$asset" ]; then
+                echo "${asset}:${asset_mapping[$asset]}" >> downloads/mapping.txt
+              fi
+            done
+          fi
 
           echo "Downloaded files:"
           ls -la downloads/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create combined archive
         run: |
