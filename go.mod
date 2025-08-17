@@ -2,7 +2,7 @@ module github.com/openimsdk/openim-sdk-cpp
 
 go 1.20
 
-require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.10-win7-go1.20-compat
+require github.com/openimsdk/openim-sdk-core/v3 v3.8.3-patch.10
 
 require (
 	github.com/coder/websocket v1.8.13 // indirect
