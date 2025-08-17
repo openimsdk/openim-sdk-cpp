@@ -1,0 +1,90 @@
+// Copyright © 2023 OpenIM. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package openim.auth;
+
+option go_package = "github.com/openimsdk/protocol/auth";
+
+message getAdminTokenReq {
+  string secret = 1;
+  string userID = 3;
+}
+message getAdminTokenResp {
+  string token = 2;
+  int64 expireTimeSeconds = 3;
+}
+
+message forceLogoutReq {
+  int32 platformID = 1;
+  string userID = 2;
+}
+message forceLogoutResp {}
+
+message parseTokenReq {
+  string token = 1;
+}
+message parseTokenResp {
+  string userID = 1;
+  int32 platformID = 2;
+  int64 expireTimeSeconds = 4;
+}
+
+message getUserTokenReq {
+  int32 platformID = 1;
+  string userID = 2;
+}
+
+message getUserTokenResp {
+  string token = 1;
+  int64 expireTimeSeconds = 2;
+}
+
+message invalidateTokenReq {
+  string preservedToken = 1;
+  string userID = 2;
+  int32 platformID = 3;
+}
+message invalidateTokenResp {}
+
+message kickTokensReq {
+  repeated string tokens = 1;
+}
+message kickTokensResp {}
+
+message GetExistingTokenReq {
+  string userID = 1;
+  int32 platformID = 2;
+}
+
+message getExistingTokenResp {
+  map<string, int32> tokenStates = 1;
+}
+
+service Auth {
+  // Generate token
+  rpc getAdminToken(getAdminTokenReq) returns (getAdminTokenResp);
+  // Admin retrieves user token
+  rpc getUserToken(getUserTokenReq) returns (getUserTokenResp);
+  // Force logout
+  rpc forceLogout(forceLogoutReq) returns (forceLogoutResp);
+  // Parse token
+  rpc parseToken(parseTokenReq) returns (parseTokenResp);
+  // Invalidate or mark the token as kicked out
+  rpc invalidateToken(invalidateTokenReq) returns (invalidateTokenResp);
+  // kick tokens
+  rpc kickTokens(kickTokensReq) returns (kickTokensResp);
+  // Get existing token
+  rpc getExistingToken(GetExistingTokenReq) returns (getExistingTokenResp);
+}

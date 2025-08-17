@@ -1,0 +1,497 @@
+// Copyright © 2023 OpenIM. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package openim.group;
+
+import "sdkws/sdkws.proto";
+import "wrapperspb/wrapperspb.proto";
+
+option go_package = "github.com/openimsdk/protocol/group";
+
+message CreateGroupReq {
+  repeated string memberUserIDs = 1;
+  openim.sdkws.GroupInfo groupInfo = 2;
+  repeated string adminUserIDs = 3;
+  string ownerUserID = 4; //owner
+  optional bool sendMessage = 5;
+}
+message CreateGroupResp {
+  openim.sdkws.GroupInfo groupInfo = 1;
+}
+
+message GetGroupsInfoReq {
+  repeated string groupIDs = 1;
+}
+message GetGroupsInfoResp {
+  repeated openim.sdkws.GroupInfo groupInfos = 1;
+}
+
+message SetGroupInfoReq {
+  openim.sdkws.GroupInfoForSet groupInfoForSet = 1;
+}
+message SetGroupInfoResp {}
+
+message SetGroupInfoExReq {
+  string groupID = 1;
+  openim.protobuf.StringValue groupName = 2;
+  openim.protobuf.StringValue notification = 3;
+  openim.protobuf.StringValue introduction = 4;
+  openim.protobuf.StringValue faceURL = 5;
+  openim.protobuf.StringValue ex = 6;
+  openim.protobuf.Int32Value needVerification = 7;
+  openim.protobuf.Int32Value lookMemberInfo = 8;
+  openim.protobuf.Int32Value applyMemberFriend = 9;
+}
+message SetGroupInfoExResp {}
+
+message GetGroupApplicationListReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string fromUserID = 2; //owner or admin
+  repeated string groupIDs = 3;
+  repeated int32 handleResults = 4;
+}
+
+message GetGroupApplicationListResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupRequest groupRequests = 2;
+}
+
+message GetGroupApplicationUnhandledCountReq {
+  string userID = 1;
+  int64 time = 2;
+}
+
+message GetGroupApplicationUnhandledCountResp {
+  int64 count = 1;
+}
+
+message GetUserReqApplicationListReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string userID = 2;
+  repeated string groupIDs = 3;
+  repeated int32 handleResults = 4;
+}
+
+message GetUserReqApplicationListResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupRequest groupRequests = 2;
+}
+
+message GetSpecifiedUserGroupRequestInfoReq {
+  string groupID = 1;
+  string userID = 2;
+}
+
+message GetSpecifiedUserGroupRequestInfoResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupRequest groupRequests = 2;
+}
+
+message TransferGroupOwnerReq {
+  string groupID = 1;
+  string oldOwnerUserID = 2;
+  string newOwnerUserID = 3;
+}
+message TransferGroupOwnerResp {}
+
+message JoinGroupReq {
+  string groupID = 1;
+  string reqMessage = 2;
+  int32 joinSource = 3;
+  string inviterUserID = 4;
+  string ex = 5;
+}
+message JoinGroupResp {}
+
+message GroupApplicationResponseReq {
+  string groupID = 1;
+  string fromUserID = 2; //
+  string handledMsg = 3;
+  int32 handleResult = 4;
+}
+message GroupApplicationResponseResp {}
+
+message QuitGroupReq {
+  string groupID = 1;
+  string userID = 2;
+}
+message QuitGroupResp {}
+
+message GetGroupMemberListReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string groupID = 2;
+  int32 filter = 3;
+  string keyword = 4;
+}
+
+message GetGroupMemberListResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupMemberFullInfo members = 2;
+}
+
+message GetGroupMembersInfoReq {
+  string groupID = 1;
+  repeated string userIDs = 2;
+}
+
+message GetGroupMembersInfoResp {
+  repeated openim.sdkws.GroupMemberFullInfo members = 1;
+}
+
+message KickGroupMemberReq {
+  string groupID = 1;
+  repeated string kickedUserIDs = 2;
+  string reason = 3;
+  optional bool sendMessage = 4;
+}
+
+message KickGroupMemberResp {}
+
+message GetJoinedGroupListReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string fromUserID = 2;
+}
+message GetJoinedGroupListResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupInfo groups = 2;
+}
+
+message InviteUserToGroupReq {
+  string groupID = 1;
+  string reason = 2;
+  repeated string invitedUserIDs = 3;
+  optional bool sendMessage = 4;
+}
+message InviteUserToGroupResp {}
+
+message GetGroupAllMemberReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string groupID = 2;
+}
+message GetGroupAllMemberResp {
+  repeated openim.sdkws.GroupMemberFullInfo members = 1;
+}
+
+message CMSGroup {
+  openim.sdkws.GroupInfo groupInfo = 1;
+  string groupOwnerUserName = 2;
+  string groupOwnerUserID = 3;
+}
+
+message GetGroupsReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string groupName = 2;
+  string groupID = 3;
+}
+
+message GetGroupsResp {
+  uint32 total = 1;
+  repeated CMSGroup groups = 2;
+}
+
+message GetGroupMemberReq {
+  string groupID = 1;
+}
+
+message GetGroupMembersCMSReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  string groupID = 2;
+  string userName = 3;
+}
+
+message GetGroupMembersCMSResp {
+  uint32 total = 1;
+  repeated openim.sdkws.GroupMemberFullInfo members = 2;
+}
+
+message DismissGroupReq {
+  string groupID = 1;
+  bool deleteMember = 2;
+  optional bool sendMessage = 3;
+}
+
+message DismissGroupResp {}
+
+message MuteGroupMemberReq {
+  string groupID = 1;
+  string userID = 2;
+  uint32 mutedSeconds = 3;
+}
+
+message MuteGroupMemberResp {}
+
+message CancelMuteGroupMemberReq {
+  string groupID = 1;
+  string userID = 2;
+}
+
+message CancelMuteGroupMemberResp {}
+
+message MuteGroupReq {
+  string groupID = 1;
+}
+
+message MuteGroupResp {}
+
+message CancelMuteGroupReq {
+  string groupID = 1;
+}
+
+message CancelMuteGroupResp {}
+
+message SetGroupMemberInfo {
+  string groupID = 1;
+  string userID = 2;
+  openim.protobuf.StringValue nickname = 3;
+  openim.protobuf.StringValue faceURL = 4;
+  openim.protobuf.Int32Value roleLevel = 5;
+  openim.protobuf.StringValue ex = 6;
+}
+
+message SetGroupMemberInfoReq {
+  repeated SetGroupMemberInfo members = 1;
+}
+
+message SetGroupMemberInfoResp {}
+
+message GetGroupAbstractInfoReq {
+  repeated string groupIDs = 1;
+}
+
+message GroupAbstractInfo {
+  string groupID = 1;
+  uint32 groupMemberNumber = 2;
+  uint64 groupMemberListHash = 3;
+}
+
+message GetGroupAbstractInfoResp {
+  repeated GroupAbstractInfo groupAbstractInfos = 1;
+}
+
+message GetUserInGroupMembersReq {
+  string userID = 1;
+  repeated string groupIDs = 2;
+}
+
+message GetUserInGroupMembersResp {
+  repeated openim.sdkws.GroupMemberFullInfo members = 1;
+}
+
+message GetGroupMemberUserIDsReq {
+  string groupID = 1;
+}
+
+message GetGroupMemberUserIDsResp {
+  repeated string userIDs = 1;
+}
+
+message GetGroupMemberRoleLevelReq {
+  string groupID = 1;
+  repeated int32 roleLevels = 2;
+}
+
+message GetGroupMemberRoleLevelResp {
+  repeated openim.sdkws.GroupMemberFullInfo members = 1;
+}
+
+message GetGroupInfoCacheReq {
+  string groupID = 1;
+}
+
+message GetGroupInfoCacheResp {
+  openim.sdkws.GroupInfo groupInfo = 1;
+}
+
+message GetGroupMemberCacheReq {
+  string groupID = 1;
+  string groupMemberID = 2;
+}
+
+message GetGroupMemberCacheResp {
+  openim.sdkws.GroupMemberFullInfo member = 1;
+}
+
+message GroupCreateCountReq {
+  int64 start = 1;
+  int64 end = 2;
+}
+
+message GroupCreateCountResp {
+  int64 total = 1;
+  int64 before = 2;
+  map<string, int64> count = 3;
+}
+
+message getGroupUsersReqApplicationListReq {
+  string groupID = 1;
+  repeated string userIDs = 2;
+}
+
+message getGroupUsersReqApplicationListResp {
+  int64 total = 1;
+  repeated openim.sdkws.GroupRequest groupRequests = 2;
+}
+
+message notificationUserInfoUpdateReq {
+  string userID = 1;
+  openim.sdkws.UserInfo oldUserInfo = 2;
+  openim.sdkws.UserInfo newUserInfo = 3;
+}
+
+message notificationUserInfoUpdateResp {}
+
+message getIncrementalGroupMemberReq {
+  string groupID = 1;
+  string versionID = 2;
+  uint64 version = 3;
+}
+
+message getIncrementalGroupMemberResp {
+  uint64 version = 1;
+  string versionID = 2;
+  bool full = 3;
+  repeated string delete = 4;
+  repeated openim.sdkws.GroupMemberFullInfo insert = 5;
+  repeated openim.sdkws.GroupMemberFullInfo update = 6;
+  openim.sdkws.GroupInfo group = 7;
+  uint64 sortVersion = 8;
+}
+
+message getIncrementalJoinGroupReq {
+  string userID = 1;
+  string versionID = 2;
+  uint64 version = 3;
+}
+
+message getIncrementalJoinGroupResp {
+  uint64 version = 1;
+  string versionID = 2;
+  bool full = 3;
+  repeated string delete = 4;
+  repeated openim.sdkws.GroupInfo insert = 5;
+  repeated openim.sdkws.GroupInfo update = 6;
+  uint64 sortVersion = 7;
+}
+
+message GetFullGroupMemberUserIDsReq {
+  uint64 idHash = 1;
+  string groupID = 2;
+}
+
+message GetFullGroupMemberUserIDsResp {
+  uint64 version = 1;
+  string versionID = 2;
+  bool equal = 3;
+  repeated string userIDs = 4;
+}
+
+message GetFullJoinGroupIDsReq {
+  uint64 idHash = 1;
+  string userID = 2;
+}
+
+message GetFullJoinGroupIDsResp {
+  uint64 version = 1;
+  string versionID = 2;
+  bool equal = 3;
+  repeated string groupIDs = 4;
+}
+
+message BatchGetIncrementalGroupMemberReq {
+  string userID = 1;
+  repeated getIncrementalGroupMemberReq reqList = 2;
+}
+
+message BatchGetIncrementalGroupMemberResp {
+  map<string, getIncrementalGroupMemberResp> respList = 1;
+}
+
+service group {
+  // Create group
+  rpc createGroup(CreateGroupReq) returns (CreateGroupResp);
+  // Apply to join group
+  rpc joinGroup(JoinGroupReq) returns (JoinGroupResp);
+  // Quit group
+  rpc quitGroup(QuitGroupReq) returns (QuitGroupResp);
+  // Get specific group info
+  rpc getGroupsInfo(GetGroupsInfoReq) returns (GetGroupsInfoResp);
+  // Set group info
+  rpc setGroupInfo(SetGroupInfoReq) returns (SetGroupInfoResp);
+  rpc setGroupInfoEx(SetGroupInfoExReq) returns (SetGroupInfoExResp);
+  // Get group join applications (as admin or owner)
+  rpc getGroupApplicationList(GetGroupApplicationListReq) returns (GetGroupApplicationListResp);
+
+  rpc getGroupApplicationUnhandledCount(GetGroupApplicationUnhandledCountReq) returns (GetGroupApplicationUnhandledCountResp);
+
+  // Get user's own join group applications
+  rpc getUserReqApplicationList(GetUserReqApplicationListReq) returns (GetUserReqApplicationListResp);
+  // Get join applications for this group's users
+  rpc getGroupUsersReqApplicationList(getGroupUsersReqApplicationListReq) returns (getGroupUsersReqApplicationListResp);
+  rpc getSpecifiedUserGroupRequestInfo(GetSpecifiedUserGroupRequestInfoReq) returns (GetSpecifiedUserGroupRequestInfoResp);
+  // Transfer group ownership
+  rpc transferGroupOwner(TransferGroupOwnerReq) returns (TransferGroupOwnerResp);
+  // Process join group application as owner or admin
+  rpc groupApplicationResponse(GroupApplicationResponseReq) returns (GroupApplicationResponseResp);
+  // Get members of a specific group
+  rpc getGroupMemberList(GetGroupMemberListReq) returns (GetGroupMemberListResp);
+  // Get specific group members of a group
+  rpc getGroupMembersInfo(GetGroupMembersInfoReq) returns (GetGroupMembersInfoResp);
+  // Kick member from group
+  rpc kickGroupMember(KickGroupMemberReq) returns (KickGroupMemberResp);
+  // Get groups a user has joined
+  rpc getJoinedGroupList(GetJoinedGroupListReq) returns (GetJoinedGroupListResp);
+  // Invite users to group
+  rpc inviteUserToGroup(InviteUserToGroupReq) returns (InviteUserToGroupResp);
+
+  rpc getGroups(GetGroupsReq) returns (GetGroupsResp);
+  rpc getGroupMembersCMS(GetGroupMembersCMSReq) returns (GetGroupMembersCMSResp);
+
+  // Dismiss group
+  rpc dismissGroup(DismissGroupReq) returns (DismissGroupResp);
+  // Mute a group member
+  rpc muteGroupMember(MuteGroupMemberReq) returns (MuteGroupMemberResp);
+  // Unmute a group member
+  rpc cancelMuteGroupMember(CancelMuteGroupMemberReq) returns (CancelMuteGroupMemberResp);
+  // Mute a group
+  rpc muteGroup(MuteGroupReq) returns (MuteGroupResp);
+  // Unmute a group
+  rpc cancelMuteGroup(CancelMuteGroupReq) returns (CancelMuteGroupResp);
+
+  // Set group member info
+  rpc setGroupMemberInfo(SetGroupMemberInfoReq) returns (SetGroupMemberInfoResp);
+  // Get group abstract hash
+  rpc getGroupAbstractInfo(GetGroupAbstractInfoReq) returns (GetGroupAbstractInfoResp);
+  // Get specific user's info in a group
+  rpc getUserInGroupMembers(GetUserInGroupMembersReq) returns (GetUserInGroupMembersResp);
+  // Get user IDs of group members
+  rpc getGroupMemberUserIDs(GetGroupMemberUserIDsReq) returns (GetGroupMemberUserIDsResp);
+  // Query members of specific role level in a group
+  rpc GetGroupMemberRoleLevel(GetGroupMemberRoleLevelReq) returns (GetGroupMemberRoleLevelResp);
+
+  rpc GetGroupInfoCache(GetGroupInfoCacheReq) returns (GetGroupInfoCacheResp);
+  rpc GetGroupMemberCache(GetGroupMemberCacheReq) returns (GetGroupMemberCacheResp);
+
+  rpc GroupCreateCount(GroupCreateCountReq) returns (GroupCreateCountResp);
+
+  rpc NotificationUserInfoUpdate(notificationUserInfoUpdateReq) returns (notificationUserInfoUpdateResp);
+
+  rpc getIncrementalGroupMember(getIncrementalGroupMemberReq) returns (getIncrementalGroupMemberResp);
+  rpc BatchGetIncrementalGroupMember(BatchGetIncrementalGroupMemberReq) returns (BatchGetIncrementalGroupMemberResp);
+  rpc getIncrementalJoinGroup(getIncrementalJoinGroupReq) returns (getIncrementalJoinGroupResp);
+
+  rpc GetFullGroupMemberUserIDs(GetFullGroupMemberUserIDsReq) returns (GetFullGroupMemberUserIDsResp);
+
+  rpc GetFullJoinGroupIDs(GetFullJoinGroupIDsReq) returns (GetFullJoinGroupIDsResp);
+}
