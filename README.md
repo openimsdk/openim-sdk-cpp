@@ -1,41 +1,48 @@
-# openim-sdk-cpp
+# openim-sdk-cpp (Unity/C#)
 
-Based on the secondary closure of [openim-sdk-core](https://github.com/openimsdk/openim-sdk-core), export the library of the corresponding platform
+This branch exposes a stable **C ABI** on top of [openim-sdk-core](https://github.com/openimsdk/openim-sdk-core) and ships platform-specific native libraries for **Unity / C#** via P/Invoke.
 
-# golang 编译 openharmany so 代码修改
+- Primary goals: seamless Unity integration; **broad Go version support** (builds with the latest stable Go); and **Windows 7 compatibility** via a Go 1.20 toolchain when targeting Win7.
+- Outputs: dynamic libraries (`.dll/.so/.dylib`) and the corresponding generated C headers (from `-buildmode=c-shared`).
+- Go versions: for modern OS targets, use the latest stable Go; for **Windows 7**, compile with **Go 1.20** (CGO enabled) and pin dependencies to Go 1.20–compatible versions.
 
-1. runtime/cgo/cgo.go
-   #cgo android LDFLAGS: -llog
-   改为  
-    #cgo android LDFLAGS: -lhilog_ndk.z.so
+---
 
-2. runtime/cgo/gcc_android.c
+## Targets
 
-#include <android/log.h>
-改为
-#include <hilog/log.h>
+- **Windows**: x86 (32-bit) and x64 (64-bit)
+- **Android**: `armeabi-v7a`, `arm64-v8a`
+- **iOS**: `arm64` (typically static `.a`, or `.dylib` if configured)
+- **Linux**: x86_64
+- **macOS**: x86_64 / arm64
 
-\_\_android_log_vprint(ANDROID_LOG_FATAL, "runtime/cgo", format, ap);
-改为
-OH_LOG_FATAL(LOG_APP, format, ap);
+> Library names follow the usual platform conventions: `openimsdk_*.dll` on Windows, `libopenimsdk.*` on Unix-like platforms.
 
-3. net/cgo_resold.go 参数错误修改
+---
 
-```golang
-func cgoNameinfoPTR(b []byte, sa *C.struct_sockaddr, salen C.socklen_t) (int, error) {
-	// gerrno, err := C.getnameinfo(sa, salen, (*C.char)(unsafe.Pointer(&b[0])), C.size_t(len(b)), nil, 0, C.NI_NAMEREQD)
-	// openharmany
-	gerrno, err := C.getnameinfo(sa, salen, (*C.char)(unsafe.Pointer(&b[0])), C.uint(len(b)), nil, 0, C.NI_NAMEREQD)
-	return int(gerrno), err
-}
-```
+## Prerequisites
 
-# scripts
+- **Go 1.20** with CGO enabled
+    - `CGO_ENABLED=1`
+   
+- Platform toolchains:
+    - **Windows**: MinGW-w64 (or MSVC if your scripts/toolchain are set up accordingly)
+    - **Android**: Android NDK (`ANDROID_NDK_HOME` set)
+    - **iOS/macOS**: Xcode + Command Line Tools
+    - **Linux**: GCC or Clang
+- Working module cache
+    - If you see “missing go.sum entry…”, run `go mod download all` at repo root.
 
-```bash
-gen_win_dll.bat # gen windows .dll
-gen_android_so.bat #  gen android .so
-gen_ios_dylib.sh # gen ios .a
-gen_linux_so.sh # gen linux .so
-gen_mac_dylib.sh # gen mac .dylib
-```
+---
+
+## Scripts
+
+All scripts live under `scripts/` and generate the platform artifacts in their respective output folders.
+
+```text
+scripts/
+  gen_win_dll.bat      # build Windows .dll (x86/x64), generates the .h header as well
+  gen_android_so.bat   # build Android .so for armeabi-v7a / arm64-v8a
+  gen_ios_dylib.sh     # build iOS static .a (or .dylib if configured)
+  gen_linux_so.sh      # build Linux .so (x86_64)
+  gen_mac_dylib.sh     # build macOS .dylib
