@@ -9,7 +9,7 @@ on:
       branch:
         description: "Git branch to build (e.g., unity)"
         required: true
-        default: "main"
+        default: "unity"
       dll_name:
         description: "Base name for the output DLL (without extension)"
         required: true
@@ -39,15 +39,19 @@ jobs:
       - name: Checkout target branch (e.g., unity)
         uses: actions/checkout@v4
         with:
-          # IMPORTANT: the workflow file stays on main; we checkout the target source branch here
+          # IMPORTANT: keep the "Use workflow from" dropdown on main; we checkout the target source branch here
           ref: ${{ inputs.branch }}
           fetch-depth: 0
           # submodules: recursive  # uncomment if your repo uses submodules
 
-      - name: Show current commit
+      - name: Verify checked-out ref
         run: |
-          echo "Building from branch: ${{ inputs.branch }}"
-          git log -1 --oneline
+          echo "Expected branch input: ${{ inputs.branch }}"
+          echo "HEAD commit: $(git rev-parse HEAD)"
+          echo "Remote branches that contain HEAD (detached HEAD is normal on Actions):"
+          git branch -r --contains HEAD || true
+          echo "Decorated HEAD:"
+          git show -s --format='%H %D %s' HEAD
 
       - name: Set up Go 1.20
         uses: actions/setup-go@v5
@@ -68,17 +72,13 @@ jobs:
           CXX: ${{ matrix.cxx }}
           # Win7 compatibility macros (adjust or remove if not needed)
           CGO_CFLAGS: "-D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
-          # If you need more static linking, try enabling the following (verify dependency compatibility):
-          # CGO_LDFLAGS: "-static -static-libgcc -static-libstdc++"
         run: |
           mkdir -p windows
           OUT="windows/${{ inputs.dll_name }}_${{ matrix.suffix }}.dll"
-
           echo "Building ${OUT} ..."
           go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
             -o "${OUT}" \
             "${{ inputs.package_path }}"
-
           echo "Listing artifacts in windows/:"
           ls -l windows
 
