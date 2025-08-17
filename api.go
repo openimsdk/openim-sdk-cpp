@@ -1306,26 +1306,28 @@ func delete_friend(argsStr string) (string, error) {
 func get_friend_application_list_as_recipient(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
+		Req         string `json:"req"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
 	if err != nil {
 		return "", err
 	}
 	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendApplicationInfo_List)
-	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, args.OperationId)
+	open_im_sdk.GetFriendApplicationListAsRecipient(baseCallback, args.OperationId, args.Req)
 	return "", nil
 }
 
 func get_friend_application_list_as_applicant(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
+		Req         string `json:"req"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
 	if err != nil {
 		return "", err
 	}
 	baseCallback := NewBaseCallback(args.OperationId, DataType_FriendApplicationInfo_List)
-	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, args.OperationId)
+	open_im_sdk.GetFriendApplicationListAsApplicant(baseCallback, args.OperationId, args.Req)
 	return "", nil
 }
 
@@ -1690,26 +1692,28 @@ func invite_user_to_group(argsStr string) (string, error) {
 func get_group_application_list_as_recipient(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
+		Req         string `json:"req"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
 	if err != nil {
 		return "", err
 	}
 	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupApplicationInfo_List)
-	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, args.OperationId)
+	open_im_sdk.GetGroupApplicationListAsRecipient(baseCallback, args.OperationId, args.Req)
 	return "", nil
 }
 
 func get_group_application_list_as_applicant(argsStr string) (string, error) {
 	args := struct {
 		OperationId string `json:"operationId"`
+		Req         string `json:"req"`
 	}{}
 	err := json.Unmarshal([]byte(argsStr), &args)
 	if err != nil {
 		return "", err
 	}
 	baseCallback := NewBaseCallback(args.OperationId, DataType_GroupApplicationInfo_List)
-	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, args.OperationId)
+	open_im_sdk.GetGroupApplicationListAsApplicant(baseCallback, args.OperationId, args.Req)
 	return "", nil
 }
 
