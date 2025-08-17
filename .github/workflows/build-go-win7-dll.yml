@@ -13,7 +13,7 @@ on:
       dll_name:
         description: "Base name for the output DLL (without extension)"
         required: true
-        default: "openimsdk"
+        default: "libopenimsdk"
       package_path:
         description: "Go package path to build (relative to repo root, e.g., ./ )"
         required: true
@@ -39,10 +39,9 @@ jobs:
       - name: Checkout target branch (e.g., unity)
         uses: actions/checkout@v4
         with:
-          # IMPORTANT: keep the "Use workflow from" dropdown on main; we checkout the target source branch here
           ref: ${{ inputs.branch }}
           fetch-depth: 0
-          # submodules: recursive  # uncomment if your repo uses submodules
+          # submodules: recursive
 
       - name: Verify checked-out ref
         run: |
@@ -64,7 +63,6 @@ jobs:
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
-          # Cache key based on go.sum; if go.sum changes, cache busts
           key: ${{ runner.os }}-go-${{ hashFiles(format('{0}/go.sum', inputs.package_path)) }}
           restore-keys: |
             ${{ runner.os }}-go-
@@ -72,13 +70,9 @@ jobs:
       - name: Prepare modules (populate go.sum)
         working-directory: ${{ inputs.package_path }}
         run: |
-          # Ensure proxy/sumdb are available on GitHub-hosted runners
           go env -w GOPROXY=https://proxy.golang.org,direct
           go env -w GOSUMDB=sum.golang.org
-          # Download all required modules to populate go.sum without modifying go.mod
           go mod download all
-          # Optional: tighten graph and ensure 1.20 compatibility (may edit go.mod)
-          # go mod tidy -compat=1.20
 
       - name: Install mingw-w64 for CGO cross-compilation
         run: |
@@ -92,22 +86,28 @@ jobs:
           CGO_ENABLED: "1"
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
-          # Win7 compatibility macros (adjust or remove if not needed)
           CGO_CFLAGS: "-D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
         run: |
-          mkdir -p windows
-          OUT="windows/${{ inputs.dll_name }}_${{ matrix.suffix }}.dll"
-          echo "Building ${OUT} ..."
-          go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
-            -o "${OUT}" \
-            "${{ inputs.package_path }}"
-          echo "Listing artifacts in windows/:"
-          ls -l windows
+          set -euo pipefail
+          NAME="lib${{ inputs.dll_name }}"
+          OUT_DIR="windows/${{ matrix.arch }}"
+          rm -rf "$OUT_DIR"
+          mkdir -p "$OUT_DIR"
 
-      - name: Upload artifacts
+          echo "Building ${NAME}.dll for ${{ matrix.arch }} ..."
+          go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
+            -o "${OUT_DIR}/${NAME}.dll" \
+            "${{ inputs.package_path }}"
+
+          echo "Artifacts in ${OUT_DIR}:"
+          ls -l "${OUT_DIR}"
+
+      - name: Upload artifacts (${{ matrix.arch }})
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.dll_name }}-win-dlls
+          name: lib${{ inputs.dll_name }}-${{ matrix.arch }}
           path: |
-            windows/${{ inputs.dll_name }}_*.dll
-            windows/${{ inputs.dll_name }}_*.h
+            windows/${{ matrix.arch }}/lib${{ inputs.dll_name }}.dll
+            windows/${{ matrix.arch }}/lib${{ inputs.dll_name }}.h
+            windows/${{ matrix.arch }}/lib${{ inputs.dll_name }}.dll.a
+          if-no-files-found: warn
