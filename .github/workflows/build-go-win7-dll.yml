@@ -7,13 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "要构建的代码分支（例如：unity）"
+        description: "Git branch to build (e.g., unity)"
         required: true
         default: "main"
       dll_name:
+        description: "Base name for the output DLL (without extension)"
         required: true
         default: "openimsdk"
       package_path:
+        description: "Go package path to build (relative to repo root, e.g., ./ )"
         required: true
         default: "./"
 
@@ -34,18 +36,25 @@ jobs:
             suffix: 386
 
     steps:
-      - name: Checkout
+      - name: Checkout target branch (e.g., unity)
         uses: actions/checkout@v4
         with:
-      
+          # IMPORTANT: the workflow file stays on main; we checkout the target source branch here
           ref: ${{ inputs.branch }}
+          fetch-depth: 0
+          # submodules: recursive  # uncomment if your repo uses submodules
 
-      - name: Setup Go 1.20
+      - name: Show current commit
+        run: |
+          echo "Building from branch: ${{ inputs.branch }}"
+          git log -1 --oneline
+
+      - name: Set up Go 1.20
         uses: actions/setup-go@v5
         with:
           go-version: "1.20"
 
-      - name: Install mingw-w64 for CGO cross-compile
+      - name: Install mingw-w64 for CGO cross-compilation
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends mingw-w64
@@ -57,12 +66,12 @@ jobs:
           CGO_ENABLED: "1"
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
-    
+          # Win7 compatibility macros (adjust or remove if not needed)
           CGO_CFLAGS: "-D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
+          # If you need more static linking, try enabling the following (verify dependency compatibility):
+          # CGO_LDFLAGS: "-static -static-libgcc -static-libstdc++"
         run: |
           mkdir -p windows
-
-          
           OUT="windows/${{ inputs.dll_name }}_${{ matrix.suffix }}.dll"
 
           echo "Building ${OUT} ..."
@@ -70,9 +79,10 @@ jobs:
             -o "${OUT}" \
             "${{ inputs.package_path }}"
 
+          echo "Listing artifacts in windows/:"
           ls -l windows
 
-      - name: Upload Artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.dll_name }}-win-dlls
