@@ -1,4 +1,4 @@
-name: Build Go Windows DLL
+name: Build Go Windows DLL (Win7 / Go1.20)
 
 permissions:
   contents: write
@@ -7,40 +7,75 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "Branch to build from"
+        description: "要构建的代码分支（例如：unity）"
         required: true
         default: "main"
+      dll_name:
+        required: true
+        default: "openimsdk"
+      package_path:
+        required: true
+        default: "./"
 
 jobs:
-  build-windows-dll:
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            cc: x86_64-w64-mingw32-gcc
+            cxx: x86_64-w64-mingw32-g++
+            suffix: amd64
+          - arch: "386"
+            cc: i686-w64-mingw32-gcc
+            cxx: i686-w64-mingw32-g++
+            suffix: 386
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+      
+          ref: ${{ inputs.branch }}
 
-      - name: Set up Go 1.20
+      - name: Setup Go 1.20
         uses: actions/setup-go@v5
         with:
           go-version: "1.20"
 
-      - name: Build DLLs for Windows (32-bit and 64-bit)
+      - name: Install mingw-w64 for CGO cross-compile
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends mingw-w64
+
+      - name: Build Windows DLL (${{ matrix.arch }})
+        env:
+          GOOS: windows
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: "1"
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+    
+          CGO_CFLAGS: "-D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
         run: |
           mkdir -p windows
+
           
-          echo "Building 64-bit DLL..."
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=1 \
-            go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
-            -o ./windows/openimsdk_amd64.dll ./
+          OUT="windows/${{ inputs.dll_name }}_${{ matrix.suffix }}.dll"
 
-          echo "Building 32-bit DLL..."
-          GOOS=windows GOARCH=386 CGO_ENABLED=1 \
-            go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
-            -o ./windows/openimsdk_386.dll ./
+          echo "Building ${OUT} ..."
+          go build -buildmode=c-shared -trimpath -ldflags="-s -w" \
+            -o "${OUT}" \
+            "${{ inputs.package_path }}"
 
-      - name: Upload DLLs as Artifacts
+          ls -l windows
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-dlls
-          path: ./windows/*.dll
+          name: ${{ inputs.dll_name }}-win-dlls
+          path: |
+            windows/${{ inputs.dll_name }}_*.dll
+            windows/${{ inputs.dll_name }}_*.h
