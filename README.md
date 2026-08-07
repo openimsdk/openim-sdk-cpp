@@ -1,5 +1,9 @@
 # openim-sdk-cpp
 
+> ## ⚠️ Repository Deprecation Notice
+>
+> `v3.8.3-patch.15` is the final release of this repository. This repository will be deprecated afterward, and its core logic will be merged into [openim-sdk-core](https://github.com/openimsdk/openim-sdk-core). All future releases and updates will be maintained together with openim-sdk-core.
+
 openim-sdk-cpp is the C language export layer for the [openim-sdk-core](https://github.com/openimsdk/openim-sdk-core) repository, designed to provide a simple integration method for C/C++ developers. With this SDK, developers can easily integrate OpenIM real-time messaging services into their C/C++ applications, enabling efficient handling of instant messaging, chat management, message pushing, and other features.
 
 ## Setup
@@ -89,7 +93,5 @@ This software is licensed under a dual-license model:
 If you wish to use this software under commercial terms, please contact us at: contact@openim.io
 
 For more information, see: https://www.openim.io/en/licensing
-
-
 
 
