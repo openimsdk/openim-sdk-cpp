@@ -24,6 +24,11 @@ func set_print(print C.CB_S) {
 	C.DebugPrint = print
 }
 
+//export get_sdk_version
+func get_sdk_version() *C.char {
+	return C.CString(open_im_sdk.GetSdkVersion())
+}
+
 func DebugPrint(info string) {
 	C.Call_CB_S(C.DebugPrint, C.CString("DLL:"+info))
 }
@@ -697,6 +702,12 @@ func get_multiple_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conv
 	open_im_sdk.GetMultipleConversation(baseCallback, C.GoString(operationID), C.GoString(conversationIDList))
 }
 
+//export search_conversation
+func search_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, searchParam *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.SearchConversation(baseCallback, C.GoString(operationID), C.GoString(searchParam))
+}
+
 //export set_conversation
 func set_conversation(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char, req *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
@@ -779,6 +790,12 @@ func typing_status_update(cCallback C.CB_S_I_S_S, operationID *C.char, recvID *C
 func mark_conversation_message_as_read(cCallback C.CB_S_I_S_S, operationID *C.char, conversationID *C.char) {
 	baseCallback := NewBaseCallback(cCallback, operationID)
 	open_im_sdk.MarkConversationMessageAsRead(baseCallback, C.GoString(operationID), C.GoString(conversationID))
+}
+
+//export mark_all_conversation_message_as_read
+func mark_all_conversation_message_as_read(cCallback C.CB_S_I_S_S, operationID *C.char) {
+	baseCallback := NewBaseCallback(cCallback, operationID)
+	open_im_sdk.MarkAllConversationMessageAsRead(baseCallback, C.GoString(operationID))
 }
 
 //export delete_message_from_local_storage

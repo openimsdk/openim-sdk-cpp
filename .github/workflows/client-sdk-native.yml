@@ -1,0 +1,151 @@
+name: Client SDK native libraries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_call:
+    inputs:
+      cpp_ref:
+        description: Exact openim-sdk-cpp tag, branch, or commit to build
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      cpp_ref:
+        description: Exact openim-sdk-cpp tag, branch, or commit to build
+        required: true
+        type: string
+        default: 3.8.3-patch
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: mac_arm64
+            runner: macos-15
+            goos: darwin
+            goarch: arm64
+            library: libopenimsdk.dylib
+          - target: mac_x64
+            runner: macos-15-intel
+            goos: darwin
+            goarch: amd64
+            library: libopenimsdk.dylib
+          - target: linux_arm64
+            runner: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+            library: libopenimsdk.so
+          - target: linux_x64
+            runner: ubuntu-24.04
+            goos: linux
+            goarch: amd64
+            library: libopenimsdk.so
+          - target: win_x64
+            runner: windows-2025
+            goos: windows
+            goarch: amd64
+            library: libopenimsdk.dll
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Resolve source ref
+        id: source
+        shell: bash
+        env:
+          CALLED_REF: ${{ inputs.cpp_ref }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          ref="${CALLED_REF:-$CURRENT_SHA}"
+          test -n "$ref"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Check out openim-sdk-cpp
+        uses: actions/checkout@v4
+        with:
+          repository: OpenIMSDK/openim-sdk-cpp
+          ref: ${{ steps.source.outputs.ref }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Go from go.mod
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go/go.mod
+          cache-dependency-path: go/go.sum
+
+      - name: Install Windows C compiler
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc
+
+      - name: Build native library
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          LIBRARY: ${{ matrix.library }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          mkdir -p "artifacts/$TARGET"
+          cd go
+          CGO_ENABLED=1 go build \
+            -buildmode=c-shared \
+            -trimpath \
+            -ldflags="-s -w" \
+            -o "../artifacts/$TARGET/$LIBRARY" .
+          core_version="$(go list -m -f '{{.Version}}' github.com/openimsdk/openim-sdk-core/v3)"
+          test -n "$core_version"
+          printf '%s' "$core_version" > "../artifacts/$TARGET/version"
+
+      - name: Build Windows native library
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          LIBRARY: ${{ matrix.library }}
+          TARGET: ${{ matrix.target }}
+          CGO_ENABLED: 1
+          CC: gcc
+        run: |
+          mkdir -p "artifacts/$TARGET"
+          cd go
+          go build \
+            -buildmode=c-shared \
+            -trimpath \
+            -ldflags="-s -w" \
+            -o "../artifacts/$TARGET/$LIBRARY" .
+          core_version="$(go list -m -f '{{.Version}}' github.com/openimsdk/openim-sdk-core/v3)"
+          test -n "$core_version"
+          printf '%s' "$core_version" > "../artifacts/$TARGET/version"
+
+      - name: Validate native slice
+        shell: bash
+        env:
+          LIBRARY: ${{ matrix.library }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          test -s "artifacts/$TARGET/$LIBRARY"
+          test -s "artifacts/$TARGET/libopenimsdk.h"
+          test -s "artifacts/$TARGET/version"
+
+      - name: Upload native slice
+        uses: actions/upload-artifact@v4
+        with:
+          name: openim-native-${{ matrix.target }}
+          path: artifacts/${{ matrix.target }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
